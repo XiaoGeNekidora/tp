@@ -1,0 +1,8 @@
+package seedu.duke.common;
+
+public class Messages {
+    public static final String MESSAGE_WELCOME = "Welcome to Equipment Master! How can I help you today?";
+    public static final String MESSAGE_GOODBYE = "Welcome to Equipment Master! How can I help you today?";
+    public static final String MESSAGE_INVALID_INPUT = "OOPS! Sorry I don't understand this :(";
+    public static final String MESSAGE_INVALID_ADD_FORMAT = "Please enter with the right format (with /n and /q)";
+}

@@ -1,10 +1,9 @@
 package seedu.duke.parser;
 
-import static seedu.duke.common.Messages.MESSAGE_INVALID_ADD_FORMAT;
-import static seedu.duke.common.Messages.MESSAGE_INVALID_INPUT;
-
 import seedu.duke.commands.*;
 import seedu.duke.exception.EquipmentMasterException;
+
+import static seedu.duke.common.Messages.*;
 
 public class Parser {
 
@@ -78,7 +77,7 @@ public class Parser {
 
         // Check if the user only typed "find" without any keywords
         if (words.length < 2 || words[1].trim().isEmpty()) {
-            throw new EquipmentMasterException("Please provide a keyword to find. Example: find STM32");
+            throw new EquipmentMasterException(MESSAGE_INVALID_FIND_FORMAT);
         }
 
         String keyword = words[1].trim();

@@ -11,6 +11,12 @@ public class Ui {
     private static final String DIVIDER = "===================================================";
     private final Scanner in;
     private final PrintStream out;
+    private final String logo = "    ______                                     __     __  ___                __               \n"
+            + "   / ____/____ _ __  __ ____   ____   ____ _  / /_   /  |/  /____ _ _____ / /_ ___   _____\n"
+            + "  / __/  / __ `// / / // __ \\ / __ \\ / __ `/ / __/  / /|_/ // __ `// ___// __// _ \\ / ___/\n"
+            + " / /___ / /_/ // /_/ // /_/ // /_/ // /_/ / / /_   / /  / // /_/ /(__  )/ /_ /  __// /    \n"
+            + "/_____/ \\__, / \\__,_// .___// .___/ \\__,_/  \\__/  /_/  /_/ \\__,_//____/ \\__/ \\___//_/     \n"
+            + "          /_/       /_/    /_/                                                            ";
 
     public Ui() {
         this(System.in, System.out);
@@ -31,6 +37,8 @@ public class Ui {
 
     public void showWelcomeMessage() {
         showMessage(MESSAGE_WELCOME);
+        showMessage(logo);
+        showLine();
     }
 
     public void showGoodByeMessage() {

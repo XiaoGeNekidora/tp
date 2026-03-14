@@ -12,16 +12,14 @@ public class Equipment {
     private int loaned;
 
     /**
-     * Creates new Equipment with the specified name and quantity.
-     * All items are initially available and none are loaned.
-     *
+     * Constructs an Equipment object with full lifecycle attributes.
      * @param name Name of the equipment.
-     * @param quantity Total quantity of the equipment.
+     * @param total Initial total quantity.
      */
-    public Equipment(String name, int quantity) {
+    public Equipment(String name, int total) {
         this.name = name;
-        this.quantity = quantity;
-        this.available = quantity;
+        this.quantity = total;
+        this.available = total;
         this.loaned = 0;
     }
 

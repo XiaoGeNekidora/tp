@@ -1,6 +1,13 @@
 package seedu.equipmentmaster.parser;
 
-import seedu.equipmentmaster.commands.*;
+import seedu.equipmentmaster.commands.AddCommand;
+import seedu.equipmentmaster.commands.ByeCommand;
+import seedu.equipmentmaster.commands.Command;
+import seedu.equipmentmaster.commands.FindCommand;
+import seedu.equipmentmaster.commands.ListCommand;
+import seedu.equipmentmaster.commands.SetSemCommand;
+import seedu.equipmentmaster.commands.SetStatusCommand;
+import seedu.equipmentmaster.commands.GetSemCommand;
 import seedu.equipmentmaster.exception.EquipmentMasterException;
 
 

@@ -49,7 +49,7 @@ public class AcademicSemester {
 
     /**
      * Returns the string representation of the academic semester.
-     * * @return Formatted string (e.g., "AY2024/25 Sem1").
+     * @return Formatted string (e.g., "AY2024/25 Sem1").
      */
     @Override
     public String toString() {
@@ -59,7 +59,7 @@ public class AcademicSemester {
 
     /**
      * Checks if this semester is equal to another object.
-     * * @param obj The object to compare with.
+     * @param obj The object to compare with.
      * @return true if the start year and semester number match.
      */
     @Override
@@ -69,5 +69,12 @@ public class AcademicSemester {
             return this.startYear == other.startYear && this.semester == other.semester;
         }
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Integer.hashCode(startYear);
+        result = 31 * result + Integer.hashCode(semester);
+        return result;
     }
 }

@@ -1,9 +1,5 @@
 package seedu.equipmentmaster.equipment;
 
-import seedu.equipmentmaster.semester.AcademicSemester;
-
-import java.util.ArrayList;
-
 /**
  * Represents a piece of equipment in the EquipmentMaster system.
  * Each equipment has a name, total quantity, number of available items,

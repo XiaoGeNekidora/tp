@@ -142,7 +142,7 @@ public class Storage {
 
     /**
      * Loads the system semester from the settings file.
-     * @return The saved AcademicSemester, or a default value if not found.
+     * @return The saved semester as a String, or a default value if not found.
      */
     public String loadSettings() {
         File file = new File(settingsPath);

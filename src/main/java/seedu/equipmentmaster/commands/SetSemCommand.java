@@ -15,7 +15,7 @@ public class SetSemCommand extends Command {
 
     /**
      * Initializes the command with the raw semester string provided by the user.
-     * * @param rawSem The user input string for the new semester.
+     * @param rawSem The user input string for the new semester.
      */
     public SetSemCommand(String rawSem) {
         this.rawSem = rawSem;
@@ -25,7 +25,7 @@ public class SetSemCommand extends Command {
      * Executes the command to update the global system semester.
      * * @param equipments The list of equipment (not used in this command).
      * @param ui The user interface to display messages.
-     * @param storage The storage handler (not used in this command).
+     * @param storage The storage handler used to persist the updated semester.
      */
     @Override
     public void execute(EquipmentList equipments, Ui ui, Storage storage) {

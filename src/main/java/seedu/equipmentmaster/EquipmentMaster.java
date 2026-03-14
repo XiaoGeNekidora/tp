@@ -22,7 +22,7 @@ public class EquipmentMaster {
      */
     public EquipmentMaster(String filePath) {
         this.ui = new Ui();
-        this.storage = new Storage(filePath, ui);
+        EquipmentMaster.storage = new Storage(filePath, ui);
 
         // Load the system time from settings.txt during startup
         try {

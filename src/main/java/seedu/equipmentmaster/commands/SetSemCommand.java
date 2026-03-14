@@ -30,6 +30,8 @@ public class SetSemCommand extends Command {
     @Override
     public void execute(EquipmentList equipments, Ui ui, Storage storage) {
         try {
+            // Assertion: Parser should have already verified that rawSem is not null.
+            assert rawSem != null : "Semester string in SetSemCommand should not be null";
             AcademicSemester newSem = new AcademicSemester(rawSem);
             EquipmentMaster.setCurrentSemester(newSem);
             storage.saveSettings(newSem);

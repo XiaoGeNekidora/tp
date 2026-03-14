@@ -44,6 +44,9 @@ public class AcademicSemester {
      */
     public double calculateAgeInYears(AcademicSemester current) {
         int elapsedSemesters = (current.startYear - this.startYear) * 2 + (current.semester - this.semester);
+        // Assertion: Age should not be negative in a logical system state.
+        // This helps catch logic errors during development.
+        assert elapsedSemesters >= 0 : "Calculated age cannot be negative!";
         return elapsedSemesters / 2.0;
     }
 

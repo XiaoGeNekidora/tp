@@ -8,6 +8,7 @@ import seedu.equipmentmaster.commands.ListCommand;
 import seedu.equipmentmaster.commands.SetSemCommand;
 import seedu.equipmentmaster.commands.SetStatusCommand;
 import seedu.equipmentmaster.commands.GetSemCommand;
+import seedu.equipmentmaster.commands.DeleteCommand;
 import seedu.equipmentmaster.exception.EquipmentMasterException;
 
 
@@ -43,6 +44,8 @@ public class Parser {
             return parseSetSem(fullCommand);
         case "getsem":
             return new GetSemCommand();
+        case "delete":
+            return parseDelete(fullCommand);
 
         default:
             throw new EquipmentMasterException(MESSAGE_INVALID_INPUT);
@@ -234,5 +237,41 @@ public class Parser {
 
         String rawSemester = words[1].trim();
         return new SetSemCommand(rawSemester);
+    }
+
+    /**
+     * Parses the arguments for the 'delete' command.
+     * * @param fullCommand The complete input string.
+     * @return A DeleteCommand object.
+     * @throws EquipmentMasterException If the format is invalid.
+     */
+    public static Command parseDelete(String fullCommand) throws EquipmentMasterException {
+        if (!fullCommand.contains("q/")) {
+            throw new EquipmentMasterException("Invalid format. Use: delete [INDEX|n/NAME] q/QUANTITY");
+        }
+
+        String[] parts = fullCommand.split("q/");
+        // Removes the word "delete" to find the name or index
+        String identifierPart = parts[0].replaceFirst("(?i)delete", "").trim();
+        String quantityStr = parts[1].trim();
+
+        int quantity;
+        try {
+            quantity = Integer.parseInt(quantityStr);
+        } catch (NumberFormatException e) {
+            throw new EquipmentMasterException("Quantity must be a valid number.");
+        }
+
+        if (identifierPart.startsWith("n/")) {
+            String name = identifierPart.substring(2).trim();
+            return new DeleteCommand(name, quantity);
+        } else {
+            try {
+                int index = Integer.parseInt(identifierPart);
+                return new DeleteCommand(index, quantity);
+            } catch (NumberFormatException e) {
+                throw new EquipmentMasterException("Please provide a valid name (n/) or index.");
+            }
+        }
     }
 }

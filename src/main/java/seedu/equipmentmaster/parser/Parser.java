@@ -36,7 +36,7 @@ public class Parser {
      * @return The list of registered CommandSpec objects.
      */
     public static ArrayList<CommandSpec> getCommandSpecs() {
-        return commandSpecs;
+        return new ArrayList<>(commandSpecs);
     }
 
     /**

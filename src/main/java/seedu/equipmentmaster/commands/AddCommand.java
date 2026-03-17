@@ -43,15 +43,22 @@ public class AddCommand extends Command{
         }
         int nameIndex = fullCommand.indexOf("n/");
         int quantityIndex = fullCommand.indexOf("q/");
-        String name = "";
-        String qtString = "";
+        String name;
+        String qtString;
         if (nameIndex < quantityIndex) {
-            name = fullCommand.substring(nameIndex + 2, quantityIndex - 1);
-            qtString = fullCommand.substring(quantityIndex + 2);
+            // Name appears before quantity: extract up to the start of "q/" and trim.
+            name = fullCommand.substring(nameIndex + 2, quantityIndex).trim();
+            qtString = fullCommand.substring(quantityIndex + 2).trim();
         } else {
-            qtString = fullCommand.substring(quantityIndex + 2, nameIndex - 1);
-            name = fullCommand.substring((nameIndex + 2));
+            // Quantity appears before name: extract up to the start of "n/" and trim.
+            qtString = fullCommand.substring(quantityIndex + 2, nameIndex).trim();
+            name = fullCommand.substring(nameIndex + 2).trim();
         }
+
+        if (name.isEmpty() || qtString.isEmpty()) {
+            throw new EquipmentMasterException(MESSAGE_INVALID_ADD_FORMAT);
+        }
+
         try {
             int quantity = Integer.parseInt(qtString);
             if (quantity <= 0) {

@@ -1,5 +1,7 @@
 package seedu.equipmentmaster.equipment;
 
+import seedu.equipmentmaster.semester.AcademicSemester;
+
 /**
  * Represents a piece of equipment in the EquipmentMaster system.
  * Each equipment has a name, total quantity, number of available items,
@@ -10,6 +12,8 @@ public class Equipment {
     private int quantity;
     private int available;
     private int loaned;
+    private AcademicSemester purchaseSem;
+    private double lifespanYears;
 
     /**
      * Constructs an Equipment object with full lifecycle attributes.
@@ -36,6 +40,45 @@ public class Equipment {
         this.quantity = quantity;
         this.available = available;
         this.loaned = loaned;
+    }
+
+    /**
+     * Constructs a new Equipment object with lifecycle data.
+     * Available quantity is initially set to total quantity, and loaned is set to 0.
+     * This is primarily used when adding a brand-new equipment via the CLI.
+     *
+     * @param name Name of the equipment.
+     * @param total Initial total quantity.
+     * @param purchaseSem The academic semester when the equipment was purchased.
+     * @param lifespanYears The expected lifespan in years (e.g., 2.5).
+     */
+    public Equipment(String name, int total, AcademicSemester purchaseSem, double lifespanYears) {
+        this.name = name;
+        this.quantity = total;
+        this.available = total;
+        this.loaned = 0;
+        this.purchaseSem = purchaseSem;
+        this.lifespanYears = lifespanYears;
+    }
+
+    /**
+     * Constructs an Equipment object with all details, including lifecycle data.
+     * This is primarily used when loading existing data from the storage file.
+     *
+     * @param name Name of the equipment.
+     * @param quantity Total quantity of the equipment.
+     * @param available Number of available items.
+     * @param loaned Number of loaned items.
+     * @param purchaseSem The academic semester when the equipment was purchased.
+     * @param lifespanYears The expected lifespan in years.
+     */
+    public Equipment(String name, int quantity, int available, int loaned, AcademicSemester purchaseSem, double lifespanYears) {
+        this.name = name;
+        this.quantity = quantity;
+        this.available = available;
+        this.loaned = loaned;
+        this.purchaseSem = purchaseSem;
+        this.lifespanYears = lifespanYears;
     }
 
     /**
@@ -108,6 +151,42 @@ public class Equipment {
      */
     public void setQuantity(int quantity) {
         this.quantity = quantity;
+    }
+
+    /**
+     * Retrieves the academic semester when the equipment was purchased.
+     *
+     * @return The purchase semester of the equipment, or null if not set.
+     */
+    public AcademicSemester getPurchaseSem() {
+        return purchaseSem;
+    }
+
+    /**
+     * Sets the academic semester when the equipment was purchased.
+     *
+     * @param purchaseSem The semester to set as the purchase date.
+     */
+    public void setPurchaseSem(AcademicSemester purchaseSem) {
+        this.purchaseSem = purchaseSem;
+    }
+
+    /**
+     * Retrieves the expected lifespan of the equipment in years.
+     *
+     * @return The lifespan in years (e.g., 2.5).
+     */
+    public double getLifespanYears() {
+        return lifespanYears;
+    }
+
+    /**
+     * Sets the expected lifespan of the equipment in years.
+     *
+     * @param lifespanYears The expected lifespan in years. Can include fractional values (e.g., 0.5).
+     */
+    public void setLifespanYears(double lifespanYears) {
+        this.lifespanYears = lifespanYears;
     }
 
     /**

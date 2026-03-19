@@ -36,7 +36,7 @@ public class SetStatusCommandTest {
     public void executeByName_loanPositive_updates() throws EquipmentMasterException {
         // Arrange
         AcademicSemester testSem = new AcademicSemester("AY2025/26 Sem2");
-        equipments.addEquipment(new Equipment("BasyS3 FPGA", 40, 40, 0, testSem, 5.0));
+        equipments.addEquipment(new Equipment("BasyS3 FPGA", 40, 40, 0, testSem, 5.0, 0));
         SetStatusCommand command = new SetStatusCommand("BasyS3 FPGA", 5, "loaned");
 
         // Act
@@ -67,7 +67,7 @@ public class SetStatusCommandTest {
     public void executeByIndex_returnPositive_updates() throws EquipmentMasterException {
         // Arrange
         AcademicSemester testSem = new AcademicSemester("AY2025/26 Sem2");
-        equipments.addEquipment(new Equipment("BasyS3 FPGA", 40, 30, 10, testSem, 5.0));
+        equipments.addEquipment(new Equipment("BasyS3 FPGA", 40, 30, 10, testSem, 5.0, 0));
         SetStatusCommand command = new SetStatusCommand(1, 3, "available");
 
         // Act

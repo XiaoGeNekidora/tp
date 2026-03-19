@@ -74,11 +74,11 @@ public class ReportCommandTest {
         AcademicSemester purchaseSem = new AcademicSemester("AY2024/25 Sem1");
 
         // 1. Expired Equipment (Lifespan: 2 years. Age in AY28/29 Sem1 will be 4 years) -> SHOULD BE REPORTED
-        Equipment expiredEq = new Equipment("STM32", 10, purchaseSem, 2.0);
+        Equipment expiredEq = new Equipment("STM32", 10, 10, 0, purchaseSem, 2.0, 0);
         equipments.addEquipment(expiredEq);
 
         // 2. Healthy Equipment (Lifespan: 10 years. Age will be 4 years) -> SHOULD BE SKIPPED
-        Equipment healthyEq = new Equipment("Oscilloscope", 5, purchaseSem, 10.0);
+        Equipment healthyEq = new Equipment("Oscilloscope", 5, 5, 0, purchaseSem, 10.0, 0);
         equipments.addEquipment(healthyEq);
 
         // 3. Legacy Equipment (No purchaseSem or lifespan) -> SHOULD BE SKIPPED
@@ -109,7 +109,7 @@ public class ReportCommandTest {
         AcademicSemester purchaseSem = new AcademicSemester("AY2025/26 Sem1");
 
         // Add a brand new equipment with a 5-year lifespan
-        Equipment newEq = new Equipment("3D Printer", 2, purchaseSem, 5.0);
+        Equipment newEq = new Equipment("3D Printer", 2, 2, 0, purchaseSem, 5.0, 0);
         equipments.addEquipment(newEq);
 
         // Check report in the SAME semester it was bought

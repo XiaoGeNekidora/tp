@@ -31,9 +31,9 @@ public class UiTableTest {
     public void toString_equipmentRows_printsFormattedTable() throws EquipmentMasterException {
         UiTable uiTable = new UiTable();
         AcademicSemester testSem = new AcademicSemester("AY2025/26 Sem2");
-        uiTable.addRow(new UiTableRow(new Equipment("STM32 Development Board", 50, 45, 5, testSem, 5.0)));
-        uiTable.addRow(new UiTableRow(new Equipment("Basys3 FPGA", 20, 20, 0, testSem, 5.0)));
-        uiTable.addRow(new UiTableRow(new Equipment("HDMI Cable", 100, 100, 0, testSem, 5.0)));
+        uiTable.addRow(new UiTableRow(new Equipment("STM32 Development Board", 50, 45, 5, testSem, 5.0, 0)));
+        uiTable.addRow(new UiTableRow(new Equipment("Basys3 FPGA", 20, 20, 0, testSem, 5.0, 0)));
+        uiTable.addRow(new UiTableRow(new Equipment("HDMI Cable", 100, 100, 0, testSem, 5.0, 0)));
 
         String expectedOutput = """
                 1. STM32 Development Board | Total: 50  | Available: 45  | Loaned: 5 | \
@@ -57,11 +57,11 @@ public class UiTableTest {
         uiTable.addRow(new UiTableRow("Name", "Total", "Available", "Loaned", "Purchase", "Life"));
 
         // Add rows using the Equipment objects
-        uiTable.addRow(new UiTableRow(new Equipment("STM32 Development Board", 50, 45, 5, testSem, 5.0)));
-        uiTable.addRow(new UiTableRow(new Equipment("Basys3 FPGA", 20, 20, 0, testSem, 5.0)));
+        uiTable.addRow(new UiTableRow(new Equipment("STM32 Development Board", 50, 45, 5, testSem, 5.0, 0)));
+        uiTable.addRow(new UiTableRow(new Equipment("Basys3 FPGA", 20, 20, 0, testSem, 5.0, 0)));
 
         // Test a "Legacy" case to ensure your <N/A> logic works!
-        uiTable.addRow(new UiTableRow(new Equipment("HDMI Cable", 100, 100, 0, null, 0.0)));
+        uiTable.addRow(new UiTableRow(new Equipment("HDMI Cable", 100, 100, 0, null, 0.0, 0)));
 
         String expectedOutput = """
             #  Name                    | Total      | Available      |\

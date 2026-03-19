@@ -8,6 +8,8 @@ import seedu.equipmentmaster.semester.AcademicSemester;
 import seedu.equipmentmaster.storage.Storage;
 import seedu.equipmentmaster.ui.Ui;
 
+import java.util.ArrayList;
+
 import static seedu.equipmentmaster.common.Messages.MESSAGE_INVALID_ADD_FORMAT;
 
 import java.util.logging.Level;
@@ -19,29 +21,68 @@ import java.util.logging.Logger;
  * name and quantity, adds it to the equipment list, saves the updated
  * list to storage, and displays a confirmation message to the user.
  */
-public class AddCommand extends Command{
+public class AddCommand extends Command {
     private static final Logger logger = Logger.getLogger(AddCommand.class.getName());
 
     private final String name;
     private final int quantity;
     private final AcademicSemester purchaseSem;
     private final double lifespanYears;
+    private final ArrayList<String> moduleCodes;
     private final int minQuantity;
 
+
     /**
-     * Constructs an {@code AddCommand} with the specified equipment name and quantity.
+     * Constructs an {@code AddCommand} with the specified equipment name, quantity, and module codes.
      *
-     * @param name Name of the equipment to add.
-     * @param quantity Number of items to add.
-     * @param purchaseSem Sem that the item was bought
-     * @param lifespanYears Lifespan of the item in year
+     * @param name        Name of the equipment to add.
+     * @param quantity    Number of items to add.
+     * @param quantity    Number of items to add.
+     * @param moduleCodes List of module codes associated with this equipment.
      */
-    public AddCommand(String name, int quantity, AcademicSemester purchaseSem, double lifespanYears, int minQuantity) {
+    public AddCommand(String name, int quantity, AcademicSemester purchaseSem,
+                      double lifespanYears, int minQuantity, ArrayList<String> moduleCodes) {
         this.name = name;
         this.quantity = quantity;
         this.purchaseSem = purchaseSem;
         this.lifespanYears = lifespanYears;
         this.minQuantity = minQuantity;
+        this.moduleCodes = moduleCodes != null ? moduleCodes : new ArrayList<>();
+    }
+
+    /**
+     * Constructs an {@code AddCommand} with only the equipment name and quantity.
+     * This constructor is used when adding basic equipment without any optional fields
+     * (no purchase semester, no lifespan, no module codes).
+     *
+     * @param name     Name of the equipment to add.
+     * @param quantity Number of items to add.
+     */
+    public AddCommand(String name, int quantity) {
+        this.name = name;
+        this.quantity = quantity;
+        this.purchaseSem = null;
+        this.lifespanYears = 0.0;
+        this.minQuantity = 0;
+        this.moduleCodes = new ArrayList<>();
+    }
+
+    /**
+     * Constructs an {@code AddCommand} with equipment name, quantity, and module codes.
+     * This constructor is used when adding equipment associated with specific modules,
+     * but without purchase semester or lifespan information.
+     *
+     * @param name        Name of the equipment to add.
+     * @param quantity    Number of items to add.
+     * @param moduleCodes List of module codes associated with this equipment.
+     */
+    public AddCommand(String name, int quantity, ArrayList<String> moduleCodes) {
+        this.name = name;
+        this.quantity = quantity;
+        this.purchaseSem = null;
+        this.lifespanYears = 0.0;
+        this.minQuantity = 0;
+        this.moduleCodes = moduleCodes != null ? moduleCodes : new ArrayList<>();
     }
 
     /**
@@ -54,27 +95,23 @@ public class AddCommand extends Command{
     public static AddCommand parse(String fullCommand) throws EquipmentMasterException {
         logger.log(Level.INFO, "Starting to parse add command input.");
 
-        if (!fullCommand.contains("n/") || (!fullCommand.contains("q/")) ||
-                (!fullCommand.contains("bought/") || (!fullCommand.contains("life/")))) {
-            logger.log(Level.WARNING,
-                    "Missing compulsory flags (n/, q/, bought/, or life/) in user input.");
-            throw new EquipmentMasterException(
-                    "Invalid add command format.\n"
-                            + "Usage: add n/NAME q/QUANTITY bought/SEMESTER life/LIFESPAN_YEARS");
+        if (!fullCommand.contains("n/") || !fullCommand.contains("q/")) {
+            logger.log(Level.WARNING, "Missing compulsory flags (n/ or q/) in user input.");
+            throw new EquipmentMasterException(MESSAGE_INVALID_ADD_FORMAT);
         }
 
+        // Extract name and quantity
         String name = extractArgument(fullCommand, "n/");
         String qtString = extractArgument(fullCommand, "q/");
         String minQtyStr = extractArgument(fullCommand, "min/");
         String purchaseSemStr = extractArgument(fullCommand, "bought/");
         String lifespanYearsStr = extractArgument(fullCommand, "life/");
 
-        if (name.isEmpty() || qtString.isEmpty() || purchaseSemStr.isEmpty() || lifespanYearsStr.isEmpty()) {
-            logger.log(Level.WARNING, "One or more parsed fields are empty.");
-            throw new EquipmentMasterException(
-                    "Invalid add command format.\n"
-                            + "Usage: add n/NAME q/QUANTITY bought/SEMESTER life/LIFESPAN_YEARS");
+        if (name.isEmpty() || qtString.isEmpty()) {
+            throw new EquipmentMasterException(MESSAGE_INVALID_ADD_FORMAT);
         }
+
+        // Parse quantity
         int quantity;
         try {
             quantity = Integer.parseInt(qtString);
@@ -83,11 +120,29 @@ public class AddCommand extends Command{
                 throw new EquipmentMasterException("Equipment quantity must be positive.");
             }
         } catch (NumberFormatException e) {
-            logger.log(Level.WARNING, "Failed to parse quantity as an integer: " + qtString, e);
+            logger.log(Level.WARNING, "Failed to parse quantity: " + qtString, e);
             throw new EquipmentMasterException("Please enter a valid whole number for quantity");
         }
-
+        AcademicSemester purchaseSem = null;
+        double lifespanYear = 0.0;
         int minQuantity = 0;
+        ArrayList<String> moduleCodes = new ArrayList<>();
+
+        if (fullCommand.contains("bought/") && fullCommand.contains("life/")) {
+            purchaseSemStr = extractArgument(fullCommand, "bought/");
+            lifespanYearsStr = extractArgument(fullCommand, "life/");
+
+            if (!purchaseSemStr.isEmpty() && !lifespanYearsStr.isEmpty()) {
+                purchaseSem = new AcademicSemester(purchaseSemStr.trim());
+                try {
+                    lifespanYear = Double.parseDouble(lifespanYearsStr.trim());
+                } catch (NumberFormatException e) {
+                    throw new EquipmentMasterException("Please enter a valid number for lifespan in years");
+                }
+            }
+        }
+
+        minQtyStr = extractArgument(fullCommand, "min/");
         if (!minQtyStr.isEmpty()) {
             try {
                 minQuantity = Integer.parseInt(minQtyStr);
@@ -95,24 +150,26 @@ public class AddCommand extends Command{
                 throw new EquipmentMasterException("Please enter a valid whole number for minimum threshold");
             }
         }
-
-        AcademicSemester purchaseSem = new AcademicSemester(purchaseSemStr.trim());
-        double lifespanYear;
-        try {
-            lifespanYear = Double.parseDouble(lifespanYearsStr.trim());
-        } catch (NumberFormatException e) {
-            logger.log(Level.WARNING, "Failed to parse lifespan in years as a number: " + lifespanYearsStr, e);
-            throw new EquipmentMasterException("Please enter a valid number for lifespan in years");
+        String[] parts = fullCommand.split(" ");
+        for (String part : parts) {
+            if (part.startsWith("m/")) {
+                String moduleCode = part.substring(2).toUpperCase().trim();
+                if (!moduleCode.isEmpty() && !moduleCodes.contains(moduleCode)) {
+                    moduleCodes.add(moduleCode);
+                }
+            }
         }
+
+
         logger.log(Level.INFO, "Successfully parsed AddCommand for equipment: " + name);
-        return new AddCommand(name, quantity, purchaseSem, lifespanYear, minQuantity);
+        return new AddCommand(name, quantity, purchaseSem, lifespanYear, minQuantity, moduleCodes);
     }
 
     /**
      * Extracts the argument value following the given prefix, up to the next known prefix or end of string.
      *
      * @param fullCommand The full user input string.
-     * @param prefix The prefix whose value should be extracted (e.g., "n/", "q/").
+     * @param prefix      The prefix whose value should be extracted (e.g., "n/", "q/").
      * @return The trimmed value associated with the prefix, or an empty string if none.
      * @throws EquipmentMasterException If the prefix cannot be found.
      */
@@ -126,7 +183,7 @@ public class AddCommand extends Command{
         }
         int valueStart = prefixIndex + prefix.length();
         int valueEnd = fullCommand.length();
-        String[] allPrefixes = { "n/", "q/", "bought/", "life/" };
+        String[] allPrefixes = {"n/", "q/", "bought/", "life/", "m/"};
         for (String otherPrefix : allPrefixes) {
             if (otherPrefix.equals(prefix)) {
                 continue;
@@ -146,21 +203,31 @@ public class AddCommand extends Command{
      * Executes the add command by creating the equipment,
      * adding it to the equipment list, saving the updated list,
      * and displaying a message to the user.
-     *
-     * @param equipments The equipment list to add the equipment to.
-     * @param ui The user interface used to display messages.
-     * @param storage The storage system used to persist data.
      */
     @Override
     public void execute(EquipmentList equipments, Ui ui, Storage storage) {
         Equipment equipment = new Equipment(name, quantity, quantity, 0, purchaseSem, lifespanYears,
-                minQuantity);
+                moduleCodes, minQuantity);
         equipments.addEquipment(equipment);
         storage.save(equipments.getAllEquipments());
-        ui.showMessage("Added " + quantity + " of " + name + ". (Total Available: "
-                + equipment.getAvailable() + ") Purchase: "
-                + purchaseSem.toString() + " | Lifespan: " +
-                lifespanYears + (lifespanYears == 1.0 ? " year" : " years")
-                + " | Min Threshold: " + minQuantity);
+
+        // Build message
+        StringBuilder message = new StringBuilder();
+        message.append("Added ").append(quantity).append(" of ").append(name);
+
+        if (!moduleCodes.isEmpty()) {
+            message.append(" with modules ").append(moduleCodes);
+        }
+
+        message.append(". (Total Available: ").append(equipment.getAvailable()).append(")");
+
+        if (purchaseSem != null) {
+            message.append(" Purchase: ").append(purchaseSem)
+                    .append(" | Lifespan: ").append(lifespanYears)
+                    .append(lifespanYears == 1.0 ? " year" : " years");
+        }
+        message.append(" | Min Threshold: ").append(minQuantity);
+
+        ui.showMessage(message.toString());
     }
 }

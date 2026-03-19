@@ -81,66 +81,52 @@ public class Storage {
 
     /**
      * Converts a formatted string from the .txt file into an Equipment object.
-     * Handles names containing "|" by parsing data columns from the end of the string.
+     * @param line A single line of text from the save file.
+     * @return An Equipment object, or null if the string format is corrupted.
      */
     private Equipment parseEquipment(String line) {
         if (line == null || line.isBlank()) {
             return null;
         }
 
-        final String delim = " | ";
-        int s1 = line.lastIndexOf(delim);
-        if (s1 == -1) {
+        try {
+            String[] parts = line.split(" \\| ", -1);
+            int totalParts = parts.length;
+
+            // Peel from back: Modules(1), Life(2), Sem(3), Min(4), Loan(5), Avail(6), Qty(7)
+            String modulesStr = parts[totalParts - 1].trim();
+            String lifeStr = parts[totalParts - 2].trim();
+            double life = lifeStr.isEmpty() ? 0.0 : Double.parseDouble(lifeStr);
+            String semStr = parts[totalParts - 3].trim();
+            AcademicSemester sem = semStr.isEmpty() ? null : new AcademicSemester(semStr);
+
+            // Checkstyle fix: Separate declarations
+            int min = Integer.parseInt(parts[totalParts - 4].trim());
+            int l = Integer.parseInt(parts[totalParts - 5].trim());
+            int a = Integer.parseInt(parts[totalParts - 6].trim());
+            int q = Integer.parseInt(parts[totalParts - 7].trim());
+
+            // Everything before the 7 metadata fields is the Name
+            StringBuilder nameBuilder = new StringBuilder();
+            for (int i = 0; i <= (totalParts - 8); i++) {
+                if (i > 0) {
+                    nameBuilder.append(" | ");
+                }
+                nameBuilder.append(parts[i]);
+            }
+            String name = nameBuilder.toString().trim();
+
+            ArrayList<String> modules = new ArrayList<>();
+            if (!modulesStr.isEmpty()) {
+                for (String m : modulesStr.split(",")) {
+                    modules.add(m.trim());
+                }
+            }
+
+            return new Equipment(name, q, a, l, sem, life, modules, min);
+        } catch (Exception e) {
             return null;
         }
-        int s2 = line.lastIndexOf(delim, s1 - 1);
-        int s3 = (s2 == -1) ? -1 : line.lastIndexOf(delim, s2 - 1);
-        int s4 = (s3 == -1) ? -1 : line.lastIndexOf(delim, s3 - 1);
-        int s5 = (s4 == -1) ? -1 : line.lastIndexOf(delim, s4 - 1);
-        int s6 = (s5 == -1) ? -1 : line.lastIndexOf(delim, s5 - 1);
-
-        if (s6 != -1) {
-            try {
-                String name = line.substring(0, s6).trim();
-                int q = Integer.parseInt(line.substring(s6 + 3, s5).trim());
-                int a = Integer.parseInt(line.substring(s5 + 3, s4).trim());
-                int l = Integer.parseInt(line.substring(s4 + 3, s3).trim());
-                int min = Integer.parseInt(line.substring(s3 + 3, s2).trim());
-                AcademicSemester sem = new AcademicSemester(line.substring(s2 + 3, s1).trim());
-                double life = Double.parseDouble(line.substring(s1 + 3).trim());
-                return new Equipment(name, q, a, l, sem, life, min);
-            } catch (Exception e) {
-                // Fall through to Case 2 if parsing fails
-            }
-        }
-
-        if (s5 != -1) {
-            try {
-                String name = line.substring(0, s5).trim();
-                int q = Integer.parseInt(line.substring(s5 + 3, s4).trim());
-                int a = Integer.parseInt(line.substring(s4 + 3, s3).trim());
-                int l = Integer.parseInt(line.substring(s3 + 3, s2).trim());
-                AcademicSemester sem = new AcademicSemester(line.substring(s2 + 3, s1).trim());
-                double life = Double.parseDouble(line.substring(s1 + 3).trim());
-                return new Equipment(name, q, a, l, sem, life, 0);
-            } catch (Exception e) {
-                // Fall through to Case 3 if parsing fails
-            }
-        }
-
-        if (s3 != -1) {
-            try {
-                String name = line.substring(0, s3).trim();
-                int q = Integer.parseInt(line.substring(s3 + 3, s2).trim());
-                int a = Integer.parseInt(line.substring(s2 + 3, s1).trim());
-                int l = Integer.parseInt(line.substring(s1 + 3).trim());
-                return new Equipment(name, q, a, l);
-            } catch (Exception e) {
-                return null;
-            }
-        }
-
-        return null;
     }
 
     /**

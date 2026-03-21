@@ -5,22 +5,24 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import seedu.equipmentmaster.equipment.Equipment;
 import seedu.equipmentmaster.exception.EquipmentMasterException;
+import seedu.equipmentmaster.modulelist.ModuleList;
 import seedu.equipmentmaster.semester.AcademicSemester;
 import seedu.equipmentmaster.ui.Ui;
+import seedu.equipmentmaster.module.Module;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class StorageTest {
 
     // Define a specific file path just for testing purposes
     private static final String TEST_FILE_PATH = "test_equipment.txt";
+    private static final Ui ui = new Ui();
 
     @TempDir
     Path tempDir; // JUnit creates a temporary directory for file tests
@@ -111,5 +113,58 @@ public class StorageTest {
         assertEquals("AY2025/26 Sem1", loadedEquipment.getPurchaseSem().toString());
         assertEquals(3.5, loadedEquipment.getLifespanYears());
         assertTrue(loadedEquipment.getModuleCodes().isEmpty());
+    }
+
+    @Test
+    public void loadModules_fileDoesNotExist_returnsEmptyList() throws EquipmentMasterException {
+        // Path points to a non-existent file in the temporary directory
+        File tempFile = tempDir.resolve("missing_modules.txt").toFile();
+        Storage storage = new Storage("dummy_equipment.txt", ui);
+
+        // Should automatically create the file and return an empty list without crashing
+        ModuleList loadedList = storage.loadModules();
+
+        assertTrue(loadedList.getModules().isEmpty(), "Loaded list should be empty.");
+        assertTrue(tempFile.exists(), "Storage should automatically create the missing file.");
+    }
+
+    @Test
+    public void loadModules_corruptedData_throwsException() throws IOException {
+        // Create a temporary file and write corrupted data into it
+        File tempFile = tempDir.resolve("corrupted_modules.txt").toFile();
+        FileWriter fw = new FileWriter(tempFile);
+        fw.write("CG2111A | oneHundredAndFifty\n"); // "oneHundredAndFifty" is not an integer
+        fw.close();
+
+        Storage storage = new Storage("dummy_equipment.txt", ui);
+
+        // Attempting to load this file should throw an exception due to NumberFormatException
+        EquipmentMasterException thrown = assertThrows(EquipmentMasterException.class, () -> {
+            storage.loadModules();
+        });
+
+        assertTrue(thrown.getMessage().contains("Data corruption detected"));
+    }
+
+    @Test
+    public void saveAndLoadModules_validData_success() throws EquipmentMasterException {
+        File tempFile = tempDir.resolve("valid_modules.txt").toFile();
+        Storage storage = new Storage("dummy_equipment.txt", ui);
+
+        // 1. Create a ModuleList and add a module
+        ModuleList originalList = new ModuleList();
+
+        originalList.addModule(new Module("CG2028", 120));
+
+        // 2. Save to the temporary file
+        storage.saveModules(originalList);
+
+        // 3. Load it back into a new ModuleList
+        ModuleList loadedList = storage.loadModules();
+
+        // 4. Verify the data remains intact
+        assertEquals(1, loadedList.getModules().size());
+        assertEquals("CG2028", loadedList.getModules().get(0).getName());
+        assertEquals(120, loadedList.getModules().get(0).getPax());
     }
 }

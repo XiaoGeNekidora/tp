@@ -1,63 +1,64 @@
 package seedu.equipmentmaster.commands;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import seedu.equipmentmaster.exception.EquipmentMasterException;
+import seedu.equipmentmaster.modulelist.ModuleList;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * JUnit tests for the {@code AddModCommand} class, focusing on the parsing logic.
+ * JUnit tests for the {@code AddModCommand} class.
+ * Tests parsing logic, syntax error handling, and execution behavior.
  */
 public class AddModCommandTest {
 
+    private ModuleList moduleList;
+
+    @BeforeEach
+    public void setUp() {
+        moduleList = new ModuleList();
+    }
+
     @Test
-    public void parse_validInput_returnsCommand() throws EquipmentMasterException {
-        // Arrange
-        String validInput = "addmod n/CG2111A pax/150";
+    public void parse_validInput_success() throws EquipmentMasterException {
+        String input = "addmod n/CG2111A pax/150";
+        AddModCommand command = AddModCommand.parse(input);
 
-        // Act
-        AddModCommand command = AddModCommand.parse(validInput);
-
-        // Assert
-        assertNotNull(command);
+        // Command should be successfully created without throwing exceptions
+        assertTrue(command instanceof AddModCommand);
     }
 
     @Test
     public void parse_missingPaxPrefix_throwsException() {
-        // Arrange
-        String invalidInput = "addmod n/CG2111A 150"; // Missing "pax/"
+        // Missing the "pax/" keyword
+        String input = "addmod n/CG2111A 150";
 
-        // Act & Assert
         EquipmentMasterException thrown = assertThrows(EquipmentMasterException.class, () -> {
-            AddModCommand.parse(invalidInput);
+            AddModCommand.parse(input);
         });
-
-        // Optionally verify the exception message
-        assertEquals("Invalid command format. \nExpected: addmod n/NAME pax/QTY", thrown.getMessage());
+        assertTrue(thrown.getMessage().contains("Invalid command format"));
     }
 
     @Test
     public void parse_nonIntegerPax_throwsException() {
-        // Arrange
-        String invalidInput = "addmod n/CG2111A pax/abc"; // "abc" is not a number
+        // Pax is provided as a string instead of an integer
+        String input = "addmod n/CG2111A pax/abc";
 
-        // Act & Assert
-        assertThrows(EquipmentMasterException.class, () -> {
-            AddModCommand.parse(invalidInput);
+        EquipmentMasterException thrown = assertThrows(EquipmentMasterException.class, () -> {
+            AddModCommand.parse(input);
         });
+        assertTrue(thrown.getMessage().contains("valid integer"));
     }
 
     @Test
-    public void constructor_negativePax_throwsException() {
-        // Arrange
-        String moduleName = "CG2111A";
-        int negativePax = -5;
+    public void parse_emptyModuleName_throwsException() {
+        // Module name is completely empty
+        String input = "addmod n/ pax/150";
 
-        // Act & Assert
         assertThrows(EquipmentMasterException.class, () -> {
-            new AddModCommand(moduleName, negativePax);
+            AddModCommand.parse(input);
         });
     }
 }

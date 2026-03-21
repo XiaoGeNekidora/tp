@@ -1,6 +1,7 @@
 package seedu.equipmentmaster.commands;
 
 import seedu.equipmentmaster.equipmentlist.EquipmentList;
+import seedu.equipmentmaster.modulelist.ModuleList;
 import seedu.equipmentmaster.parser.Parser;
 import seedu.equipmentmaster.storage.Storage;
 import seedu.equipmentmaster.ui.Ui;
@@ -31,7 +32,7 @@ public class HelpCommand extends Command {
      * @param storage The storage system (not used by this command).
      */
     @Override
-    public void execute(EquipmentList equipments, Ui ui, Storage storage) {
+    public void execute(EquipmentList equipments, ModuleList moduleList, Ui ui, Storage storage) {
         UiTable table = new UiTable(true);
         table.addRow(new UiTableRow("Command","Format"));
         for(Parser.CommandSpec spec: Parser.getCommandSpecs()){

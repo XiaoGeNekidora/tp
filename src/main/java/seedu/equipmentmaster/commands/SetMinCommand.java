@@ -3,6 +3,7 @@ package seedu.equipmentmaster.commands;
 import seedu.equipmentmaster.equipment.Equipment;
 import seedu.equipmentmaster.equipmentlist.EquipmentList;
 import seedu.equipmentmaster.exception.EquipmentMasterException;
+import seedu.equipmentmaster.modulelist.ModuleList;
 import seedu.equipmentmaster.storage.Storage;
 import seedu.equipmentmaster.ui.Ui;
 
@@ -16,7 +17,7 @@ public class SetMinCommand extends Command {
     }
 
     @Override
-    public void execute(EquipmentList equipments, Ui ui, Storage storage) throws EquipmentMasterException {
+    public void execute(EquipmentList equipments, ModuleList moduleList, Ui ui, Storage storage) throws EquipmentMasterException {
         Equipment target = equipments.findByName(name);
         if (target == null) {
             throw new EquipmentMasterException("Equipment not found: " + name);

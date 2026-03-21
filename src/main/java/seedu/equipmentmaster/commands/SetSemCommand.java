@@ -2,6 +2,7 @@ package seedu.equipmentmaster.commands;
 
 import seedu.equipmentmaster.equipmentlist.EquipmentList;
 import seedu.equipmentmaster.exception.EquipmentMasterException;
+import seedu.equipmentmaster.modulelist.ModuleList;
 import seedu.equipmentmaster.storage.Storage;
 import seedu.equipmentmaster.ui.Ui;
 import seedu.equipmentmaster.semester.AcademicSemester;
@@ -47,7 +48,7 @@ public class SetSemCommand extends Command {
      * @param storage The storage handler used to persist the updated semester.
      */
     @Override
-    public void execute(EquipmentList equipments, Ui ui, Storage storage) {
+    public void execute(EquipmentList equipments, ModuleList moduleList, Ui ui, Storage storage) {
         try {
             // Assertion: Parser should have already verified that rawSem is not null.
             assert rawSem != null : "Semester string in SetSemCommand should not be null";

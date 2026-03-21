@@ -4,6 +4,7 @@ import java.util.logging.LogManager;
 import seedu.equipmentmaster.commands.Command;
 import seedu.equipmentmaster.equipmentlist.EquipmentList;
 import seedu.equipmentmaster.exception.EquipmentMasterException;
+import seedu.equipmentmaster.modulelist.ModuleList;
 import seedu.equipmentmaster.parser.Parser;
 import seedu.equipmentmaster.semester.AcademicSemester;
 import seedu.equipmentmaster.storage.Storage;
@@ -18,6 +19,7 @@ public class EquipmentMaster {
     private static final Logger logger = Logger.getLogger(EquipmentMaster.class.getName());
     private Ui ui;
     private EquipmentList equipments;
+    private ModuleList moduleLists;
 
     /**
      * Initializes the application, loads system settings, and populates the equipment list.

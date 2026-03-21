@@ -4,6 +4,7 @@ package seedu.equipmentmaster.commands;
 import seedu.equipmentmaster.equipment.Equipment;
 import seedu.equipmentmaster.equipmentlist.EquipmentList;
 import seedu.equipmentmaster.exception.EquipmentMasterException;
+import seedu.equipmentmaster.modulelist.ModuleList;
 import seedu.equipmentmaster.semester.AcademicSemester;
 import seedu.equipmentmaster.storage.Storage;
 import seedu.equipmentmaster.ui.Ui;
@@ -203,7 +204,7 @@ public class AddCommand extends Command {
      * and displaying a message to the user.
      */
     @Override
-    public void execute(EquipmentList equipments, Ui ui, Storage storage) {
+    public void execute(EquipmentList equipments, ModuleList moduleList, Ui ui, Storage storage) {
         Equipment equipment = new Equipment(name, quantity, quantity, 0, purchaseSem, lifespanYears,
                 moduleCodes, minQuantity);
         equipments.addEquipment(equipment);

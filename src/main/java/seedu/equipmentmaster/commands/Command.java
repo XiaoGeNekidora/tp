@@ -3,6 +3,7 @@ package seedu.equipmentmaster.commands;
 
 import seedu.equipmentmaster.equipmentlist.EquipmentList;
 import seedu.equipmentmaster.exception.EquipmentMasterException;
+import seedu.equipmentmaster.modulelist.ModuleList;
 import seedu.equipmentmaster.storage.Storage;
 import seedu.equipmentmaster.ui.Ui;
 
@@ -21,7 +22,7 @@ public abstract class Command {
      * @param storage The storage system used to save or retrieve data.
      * @throws EquipmentMasterException If an error occurs during execution.
      */
-    public abstract void execute(EquipmentList equipments, Ui ui, Storage storage)
+    public abstract void execute(EquipmentList equipments, ModuleList moduleList, Ui ui, Storage storage)
             throws EquipmentMasterException;
 
     /**

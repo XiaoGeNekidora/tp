@@ -1,6 +1,7 @@
 package seedu.equipmentmaster.commands;
 
 import seedu.equipmentmaster.equipmentlist.EquipmentList;
+import seedu.equipmentmaster.modulelist.ModuleList;
 import seedu.equipmentmaster.storage.Storage;
 import seedu.equipmentmaster.ui.Ui;
 import seedu.equipmentmaster.ui.UiTable;
@@ -14,7 +15,7 @@ public class ListCommand extends Command {
     }
 
     @Override
-    public void execute(EquipmentList equipments, Ui ui, Storage storage) {
+    public void execute(EquipmentList equipments, ModuleList moduleList, Ui ui, Storage storage) {
         UiTable table = new UiTable();
 
         IntStream.range(0, equipments.getSize())

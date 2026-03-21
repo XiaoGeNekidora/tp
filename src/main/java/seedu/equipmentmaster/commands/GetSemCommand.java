@@ -1,6 +1,7 @@
 package seedu.equipmentmaster.commands;
 
 import seedu.equipmentmaster.equipmentlist.EquipmentList;
+import seedu.equipmentmaster.modulelist.ModuleList;
 import seedu.equipmentmaster.storage.Storage;
 import seedu.equipmentmaster.ui.Ui;
 import seedu.equipmentmaster.semester.AcademicSemester;
@@ -19,7 +20,7 @@ public class GetSemCommand extends Command {
      * @param storage The storage handler (not used in this command).
      */
     @Override
-    public void execute(EquipmentList equipments, Ui ui, Storage storage) {
+    public void execute(EquipmentList equipments, ModuleList moduleList, Ui ui, Storage storage) {
         AcademicSemester current = EquipmentMaster.getCurrentSemester();
 
         if (current == null) {

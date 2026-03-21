@@ -3,6 +3,7 @@ package seedu.equipmentmaster.commands;
 import seedu.equipmentmaster.equipment.Equipment;
 import seedu.equipmentmaster.equipmentlist.EquipmentList;
 import seedu.equipmentmaster.exception.EquipmentMasterException;
+import seedu.equipmentmaster.modulelist.ModuleList;
 import seedu.equipmentmaster.storage.Storage;
 import seedu.equipmentmaster.ui.Ui;
 import seedu.equipmentmaster.semester.AcademicSemester;
@@ -42,7 +43,7 @@ public class ReportCommand extends Command {
     }
 
     @Override
-    public void execute(EquipmentList equipments, Ui ui, Storage storage) {
+    public void execute(EquipmentList equipments, ModuleList moduleList, Ui ui, Storage storage) {
         if (reportType.equalsIgnoreCase("lowstock")) {
             executeLowStockReport(equipments, ui);
         } else if (reportType.equalsIgnoreCase("aging")) {

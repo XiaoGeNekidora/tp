@@ -1,17 +1,6 @@
 package seedu.equipmentmaster.parser;
 
-import seedu.equipmentmaster.commands.AddCommand;
-import seedu.equipmentmaster.commands.ByeCommand;
-import seedu.equipmentmaster.commands.FindCommand;
-import seedu.equipmentmaster.commands.ListCommand;
-import seedu.equipmentmaster.commands.GetSemCommand;
-import seedu.equipmentmaster.commands.SetSemCommand;
-import seedu.equipmentmaster.commands.HelpCommand;
-import seedu.equipmentmaster.commands.ReportCommand;
-import seedu.equipmentmaster.commands.Command;
-import seedu.equipmentmaster.commands.DeleteCommand;
-import seedu.equipmentmaster.commands.SetStatusCommand;
-import seedu.equipmentmaster.commands.SetMinCommand;
+import seedu.equipmentmaster.commands.*;
 import seedu.equipmentmaster.exception.EquipmentMasterException;
 
 
@@ -47,6 +36,10 @@ public class Parser {
         commandSpecs.add(new CommandSpec("report", "report aging [AY[YYYY]/[YY] Sem[1/2]] or report" +
                 "lowstock",
                 ReportCommand::parse));
+        commandSpecs.add(new CommandSpec("addmod", "addmod n/NAME pax/QTY", AddModCommand::parse));
+        commandSpecs.add(new CommandSpec("updatemod", "updatemod n/NAME pax/QTY", UpdateModCommand::parse));
+        commandSpecs.add(new CommandSpec("delmod", "delmod n/NAME", DelModCommand::parse));
+        commandSpecs.add(new CommandSpec("listmod", "listmod", fullCommand -> new ListModCommand()));
     }
 
     /**
@@ -122,5 +115,7 @@ public class Parser {
         public CommandFactory getCreator() {
             return creator;
         }
+
+
     }
 }

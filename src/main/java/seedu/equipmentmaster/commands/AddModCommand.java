@@ -8,6 +8,9 @@ import seedu.equipmentmaster.storage.Storage;
 import seedu.equipmentmaster.ui.Ui;
 import seedu.equipmentmaster.commands.Command;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * Represents a command to add a new course module to the system.
  */
@@ -42,5 +45,35 @@ public class AddModCommand extends Command {
         Module newModule = new Module(moduleName, pax);
         moduleList.addModule(newModule);
         ui.showMessage("Successfully added module: " + newModule);
+    }
+
+    /**
+     * Parses the full command string provided by the user to create an {@code AddModCommand}.
+     * Extracts the module name and the pax (enrollment number) using regular expressions.
+     *
+     * @param fullCommand The complete user input string (e.g., "addmod n/CG2111A pax/150").
+     * @return An {@code AddModCommand} initialized with the parsed module name and pax.
+     * @throws EquipmentMasterException If the command format is invalid or the pax is not an integer.
+     */
+    public static AddModCommand parse(String fullCommand) throws EquipmentMasterException {
+        // Strip the starting command word to isolate the arguments
+        String args = fullCommand.replaceFirst("(?i)^addmod\\s*", "").trim();
+
+        Pattern pattern = Pattern.compile("n/(.+?)\\s+pax/(.+)");
+        Matcher matcher = pattern.matcher(args);
+
+        if (!matcher.matches()) {
+            throw new EquipmentMasterException("Invalid command format. \nExpected: addmod n/NAME pax/QTY");
+        }
+
+        String moduleName = matcher.group(1).trim();
+        String paxString = matcher.group(2).trim();
+
+        try {
+            int pax = Integer.parseInt(paxString);
+            return new AddModCommand(moduleName, pax);
+        } catch (NumberFormatException e) {
+            throw new EquipmentMasterException("Invalid pax value. Please enter a valid integer (e.g., pax/150).");
+        }
     }
 }

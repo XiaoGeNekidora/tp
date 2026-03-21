@@ -163,7 +163,8 @@ public class AddCommandTest {
     }
 
     @Test
-    public void addEquipment_duplicateEquipmentWithNewModules_mergesQuantitiesAndModules() throws EquipmentMasterException {
+    public void addEquipment_duplicateEquipmentWithNewModules_mergesQuantitiesAndModules()
+            throws EquipmentMasterException {
         // Setup
         EquipmentList equipmentList = new EquipmentList();
         AcademicSemester sem = new AcademicSemester("AY2024/25 Sem1");

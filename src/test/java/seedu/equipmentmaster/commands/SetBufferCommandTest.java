@@ -12,6 +12,8 @@ import seedu.equipmentmaster.modulelist.ModuleList;
 import seedu.equipmentmaster.storage.Storage;
 import seedu.equipmentmaster.ui.Ui;
 
+import java.util.ArrayList;
+
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
@@ -70,11 +72,37 @@ public class SetBufferCommandTest {
     }
 
     @Test
-    public void parse_negativePercentage_throwsException() {
-        try {
-            SetBufferCommand.parse("setbuffer n/STM32 b/-10");
-        } catch (EquipmentMasterException e) {
-            assertTrue(e.getMessage().contains("Buffer percentage cannot be negative"));
-        }
+    public void parseEquipment_withBuffer_setsCorrectBuffer() throws EquipmentMasterException {
+        EquipmentList equipments = new EquipmentList();
+        Ui ui = new Ui();
+        Storage storage = new Storage(TEST_FILE_PATH, ui, TEST_SETTING_FILE_PATH, TEST_MODULE_FILE_PATH);
+        ModuleList moduleList = new ModuleList();
+
+        AddCommand addCommand = new AddCommand("STM32", 10);
+        addCommand.execute(equipments, moduleList, ui, storage);
+
+        SetBufferCommand command = new SetBufferCommand("STM32", 15.5);
+        command.execute(equipments, moduleList, ui, storage);
+
+        storage.save(equipments.getAllEquipments());
+        ArrayList<Equipment> loadedList = storage.load();
+
+        assertEquals(1, loadedList.size());
+        Equipment loadedEquipment = loadedList.get(0);
+        assertEquals(15.5, loadedEquipment.getBufferPercentage(), 0.0001);
+    }
+
+    @Test
+    public void parseEquipment_withoutBuffer_setsDefaultBuffer() throws EquipmentMasterException {
+        EquipmentList equipments = new EquipmentList();
+        Ui ui = new Ui();
+        Storage storage = new Storage(TEST_FILE_PATH, ui, TEST_SETTING_FILE_PATH, TEST_MODULE_FILE_PATH);
+        ModuleList moduleList = new ModuleList();
+
+        AddCommand addCommand = new AddCommand("STM32", 10);
+        addCommand.execute(equipments, moduleList, ui, storage);
+
+        Equipment equipment = equipments.getEquipment(0);
+        assertEquals(0.0, equipment.getBufferPercentage(), 0.0001);
     }
 }

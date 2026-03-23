@@ -14,7 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class EquipmentMaster {
-    private static Storage storage;
+    private Storage storage;
     private static AcademicSemester currentSystemSemester;
     private static final Logger logger = Logger.getLogger(EquipmentMaster.class.getName());
     private Ui ui;
@@ -31,7 +31,7 @@ public class EquipmentMaster {
     public EquipmentMaster(String equipmentFilePath, String settingFilePath, String moduleFilePath) {
         logger.log(Level.INFO, "Starting EquipmentMaster initialization...");
         this.ui = new Ui();
-        EquipmentMaster.storage = new Storage(equipmentFilePath, ui, settingFilePath, moduleFilePath);
+        this.storage = new Storage(equipmentFilePath, ui, settingFilePath, moduleFilePath);
 
         // Load the system time from settings.txt during startup
         try {

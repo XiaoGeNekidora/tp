@@ -157,7 +157,7 @@ public class DeleteCommandTest {
         Command cmd2 = DeleteCommand.parse("delete n/STM32 q/2 s/loaned");
         assertTrue(cmd2 instanceof DeleteCommand);
     }
-    // @@author Hongyu1231
+    // @@author
 
     @Test
     public void execute_validIndex_reducesQuantity() throws EquipmentMasterException {

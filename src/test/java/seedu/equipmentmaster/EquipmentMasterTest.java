@@ -40,7 +40,7 @@ public class EquipmentMasterTest {
             file.delete();
         }
     }
-    // @@author Hongyu1231
+    // @@author
 
     @Test
     public void constructor_missingFiles_startsEmpty() {

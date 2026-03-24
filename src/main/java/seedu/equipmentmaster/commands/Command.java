@@ -20,7 +20,7 @@ public abstract class Command {
      * @throws EquipmentMasterException If an error specific to the command's execution occurs.
      */
     public abstract void execute(Context context) throws EquipmentMasterException;
-    // @@author Hongyu1231
+    // @@author
     /**
      * Indicates whether this command should terminate the application.
      * By default, commands do not exit the program.

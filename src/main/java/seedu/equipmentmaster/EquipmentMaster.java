@@ -57,7 +57,7 @@ public class EquipmentMaster {
         // Check loaded commands
         logger.log(Level.INFO, "Loaded "+Parser.getCommandSpecs().size()+" commands.");
         assert !Parser.getCommandSpecs().isEmpty() : "No commands loaded! Check Parser initialization.";
-        // @@author Hongyu1231
+        // @@author
     }
 
     public void run() {

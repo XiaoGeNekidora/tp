@@ -161,7 +161,7 @@ public class DeleteCommand extends Command {
                         ", Min: " + target.getMinQuantity() + ")");
             }
         }
-        // @@author Hongyu1231
+        // @@author
 
         storage.save(equipments.getAllEquipments());
     }

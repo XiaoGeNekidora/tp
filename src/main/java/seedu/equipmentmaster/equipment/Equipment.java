@@ -234,7 +234,7 @@ public class Equipment {
     public void setLifespanYears(double lifespanYears) {
         this.lifespanYears = lifespanYears;
     }
-    // @@author Hongyu1231
+    // @@author
 
     /**
      * Returns the module codes associated with this equipment.

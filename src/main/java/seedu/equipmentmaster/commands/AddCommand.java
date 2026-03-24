@@ -215,7 +215,7 @@ public class AddCommand extends Command {
         }
         return results;
     }
-    // @@author Hongyu1231
+    // @@author
 
     /**
      * Executes the add equipment command.

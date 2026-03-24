@@ -166,7 +166,7 @@ public class SetStatusCommand extends Command {
         return new SetStatusCommand(index, quantity, status);
     }
     //@@author
-    
+
     /**
      * Executes the set status command.
      * Updates the loaned or available status of a specific equipment and saves the updated state.

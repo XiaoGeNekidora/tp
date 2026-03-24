@@ -1,5 +1,7 @@
 package seedu.equipmentmaster.module;
 
+import java.util.HashMap;
+
 import seedu.equipmentmaster.exception.EquipmentMasterException;
 
 /**
@@ -9,6 +11,7 @@ import seedu.equipmentmaster.exception.EquipmentMasterException;
 public class Module {
     private String name;
     private int pax;
+    private HashMap<String, Double> equipmentRequirements;
 
     /**
      * Constructs a {@code Module} with the specified name and enrollment number.
@@ -23,6 +26,7 @@ public class Module {
         }
         this.name = name;
         this.pax = pax;
+        this.equipmentRequirements = new HashMap<>();
     }
 
     /**
@@ -50,6 +54,43 @@ public class Module {
      */
     public void setPax(int pax) {
         this.pax = pax;
+    }
+
+    /**
+     * Adds or updates the requirement ratio for a specific equipment (Upsert logic).
+     *
+     * @param equipmentName The name of the equipment (e.g., "STM32").
+     * @param ratio         The fractional requirement per student (e.g., 0.2).
+     * @throws EquipmentMasterException If the ratio is zero or negative.
+     */
+    public void addEquipmentRequirement(String equipmentName, double ratio) throws EquipmentMasterException {
+        // Edge Case Handling: Negative/Zero Requirement
+        if (ratio <= 0.0) {
+            throw new EquipmentMasterException("Requirement ratio must be strictly greater than 0.0.");
+        }
+        
+        this.equipmentRequirements.put(equipmentName, ratio);
+    }
+
+    /**
+     * Removes the specified equipment from the module's requirements (Untag logic).
+     *
+     * @param equipmentName The name of the equipment to untag.
+     * @return true if the equipment was successfully removed, false if it wasn't found.
+     */
+    public boolean removeEquipmentRequirement(String equipmentName) {
+        // .remove() returns the previous value associated with the key, or null if there was no mapping.
+        return this.equipmentRequirements.remove(equipmentName) != null;
+    }
+
+    /**
+     * Retrieves the map of equipment requirements.
+     * Useful for calculating total demand later.
+     *
+     * @return The HashMap of equipment names and their requirement ratios.
+     */
+    public HashMap<String, Double> getEquipmentRequirements() {
+        return this.equipmentRequirements;
     }
 
     /**

@@ -198,7 +198,7 @@ When `ListCommand` is executed:
 
 Similarly, `HelpCommand` utilizes `UiTable` but enables the `hasHeader` flag, allowing it to render a title row ("Command" | "Format") without the auto-generated numeric index.
 
-### 3. Class Diagram
+#### 3. Class Diagram
 ![UiTable Class Diagram](images/uiTable.png)
 ---
 

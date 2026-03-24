@@ -1,3 +1,4 @@
+// @@author Hongyu1231
 package seedu.equipmentmaster.module;
 
 import java.util.HashMap;

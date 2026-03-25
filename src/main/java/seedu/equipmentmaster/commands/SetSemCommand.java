@@ -59,14 +59,19 @@ public class SetSemCommand extends Command {
                 throw new EquipmentMasterException(
                         "Please specify a semester. Usage: setsem AY[YYYY]/[YY] Sem[1/2]");
             }
+
+            // Capture old semester before updating
+            AcademicSemester oldSem = context.getCurrentSemester();
+
             AcademicSemester newSem = new AcademicSemester(rawSem);
             context.setCurrentSemester(newSem);
             storage.saveSettings(newSem);
             ui.showMessage("System time updated. Current academic semester is now set to " + newSem);
 
-            // Warn user to update module enrollments if any modules exist
+            // Only warn if semester actually changed and modules exist
             ModuleList moduleList = context.getModuleList();
-            if (moduleList != null && !moduleList.getModules().isEmpty()) {
+            if (moduleList != null && !moduleList.getModules().isEmpty()
+                    && (oldSem == null || !newSem.equals(oldSem))) {
                 ui.showMessage("[!] WARNING: Semester changed. Please remember to update the enrollment"
                         + " numbers for the following modules using the 'updatemod' command:");
                 for (Module m : moduleList.getModules()) {

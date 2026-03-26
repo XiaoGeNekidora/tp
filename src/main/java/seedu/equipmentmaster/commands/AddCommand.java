@@ -83,7 +83,7 @@ public class AddCommand extends Command {
         this.purchaseSem = null;
         this.lifespanYears = 0.0;
         this.minQuantity = 0;
-        this.moduleCodes = moduleCodes != null ? moduleCodes : new ArrayList<>();
+        this.moduleCodes = moduleCodes;
     }
 
     /**

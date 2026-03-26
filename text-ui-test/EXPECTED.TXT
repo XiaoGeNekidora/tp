@@ -25,10 +25,9 @@ Here are the available commands:
 13. updatemod | updatemod n/NAME pax/QTY
 14. delmod    | delmod n/NAME
 15. listmod   | listmod
-16. setbuffer | setbuffer n/NAME b/PERCENTAGE
-17. setbuffer | setbuffer i/INDEX b/PERCENTAGE
-18. tag       | tag m/MOD_NAME n/EQ_NAME req/FRACTION
-19. untag     | untag m/MOD_NAME n/EQ_NAME
+16. setbuffer | setbuffer n/NAME b/PERCENTAGE or setbuffer i/INDEX b/PERCENTAGE
+17. tag       | tag m/MOD_NAME n/EQ_NAME req/FRACTION
+18. untag     | untag m/MOD_NAME n/EQ_NAME
 ===================================================
 ===================================================
 Here are the available commands:
@@ -48,10 +47,9 @@ Here are the available commands:
 13. updatemod | updatemod n/NAME pax/QTY
 14. delmod    | delmod n/NAME
 15. listmod   | listmod
-16. setbuffer | setbuffer n/NAME b/PERCENTAGE
-17. setbuffer | setbuffer i/INDEX b/PERCENTAGE
-18. tag       | tag m/MOD_NAME n/EQ_NAME req/FRACTION
-19. untag     | untag m/MOD_NAME n/EQ_NAME
+16. setbuffer | setbuffer n/NAME b/PERCENTAGE or setbuffer i/INDEX b/PERCENTAGE
+17. tag       | tag m/MOD_NAME n/EQ_NAME req/FRACTION
+18. untag     | untag m/MOD_NAME n/EQ_NAME
 ===================================================
 ===================================================
 The current system time is: AY2024/25 Sem1
@@ -273,19 +271,13 @@ Equipment 'Basys3' not found.
 Buffer percentage cannot be negative.
 ===================================================
 ===================================================
-Invalid command format!
-Usage: setbuffer n/NAME b/PERCENTAGE
-Example: setbuffer n/STM32 b/10
+Invalid setbuffer format. Usage: setbuffer n/NAME b/PERCENTAGE or setbuffer i/INDEX b/PERCENTAGE
 ===================================================
 ===================================================
-Invalid command format!
-Usage: setbuffer n/NAME b/PERCENTAGE
-Example: setbuffer n/STM32 b/10
+Invalid setbuffer format. Usage: setbuffer n/NAME b/PERCENTAGE or setbuffer i/INDEX b/PERCENTAGE
 ===================================================
 ===================================================
-Invalid command format!
-Usage: setbuffer n/NAME b/PERCENTAGE
-Example: setbuffer n/STM32 b/10
+Invalid setbuffer format. Usage: setbuffer n/NAME b/PERCENTAGE or setbuffer i/INDEX b/PERCENTAGE
 ===================================================
 ===================================================
 Buffer Updated:

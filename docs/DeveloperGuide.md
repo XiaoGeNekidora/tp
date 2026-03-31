@@ -161,18 +161,30 @@ When `updatemod n/CG2111A pax/180` is executed:
 To demonstrate our adherence to defensive programming, the parsing and validation logic for `UpdateModCommand` ensures that critical metadata like `pax` cannot be set to invalid states (e.g., negative numbers) before the command is even instantiated:
 
 ```java
+// Code Snippet: Defensive Programming and Validation in UpdateModCommand
 public static UpdateModCommand parse(String fullCommand) throws EquipmentMasterException {
-    // ... regex matching omitted for brevity
-    String paxString = matcher.group(2).trim();
-    try {
-        int pax = Integer.parseInt(paxString);
-        if (pax < 0) { // Guard clause: Negative pax check
-            throw new EquipmentMasterException("Pax cannot be a negative number.");
-        }
-        return new UpdateModCommand(moduleName, pax);
-    } catch (NumberFormatException e) {
-        throw new EquipmentMasterException("Invalid pax value. Please enter a valid integer.");
+  // Strip the starting command word to isolate the arguments
+  String args = fullCommand.replaceFirst("(?i)^updatemod\\s*", "").trim();
+
+  Pattern pattern = Pattern.compile("n/(.+?)\\s+pax/(.+)");
+  Matcher matcher = pattern.matcher(args);
+
+  if (!matcher.matches()) {
+    throw new EquipmentMasterException("Invalid command format. \nExpected: updatemod n/NAME pax/QTY");
+  }
+
+  String moduleName = matcher.group(1).trim();
+  String paxString = matcher.group(2).trim();
+
+  try {
+    int pax = Integer.parseInt(paxString);
+    if (pax < 0) {
+      throw new EquipmentMasterException("Pax cannot be a negative number.");
     }
+    return new UpdateModCommand(moduleName, pax);
+  } catch (NumberFormatException e) {
+    throw new EquipmentMasterException("Invalid pax value. Please enter a valid integer.");
+  }
 }
 ```
 

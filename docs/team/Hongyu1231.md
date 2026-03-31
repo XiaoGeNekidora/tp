@@ -21,7 +21,7 @@ I architected and implemented the core analytical and structural features of the
 
 3. **Enhanced Find Feature (`find`)**
     * **What it does:** Upgraded the search algorithm to cross-reference both the equipment's name and its associated relational modules.
-    * **Justification & Depth:** Heavily refactored the iteration logic to adhere to the **Single Level of Abstraction Principle (SLAP)**. I successfully eliminated deeply nested loops (the "Arrow Anti-Pattern") by extracting helper methods and utilizing $O(1)$ early returns, significantly improving codebase testability and search performance.
+   * **Justification & Depth:** Heavily refactored the iteration logic to adhere to the **Single Level of Abstraction Principle (SLAP)**. I successfully eliminated deeply nested loops (the "Arrow Anti-Pattern") by extracting helper methods and using early returns to avoid redundant checks, significantly improving codebase testability and search performance.
 
 ### Contributions to the User Guide (UG)
 * **Authored the "Introduction" and "Quick Start" sections:** Established the application's core value proposition for University Laboratory Technicians and provided clear, step-by-step onboarding instructions to ensure a frictionless setup process for new users.

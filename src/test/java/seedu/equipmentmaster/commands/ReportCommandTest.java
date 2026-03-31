@@ -1,4 +1,3 @@
-// @@author Hongyu1231
 package seedu.equipmentmaster.commands;
 
 import org.junit.jupiter.api.AfterEach;

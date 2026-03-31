@@ -1,4 +1,4 @@
-// @@author Hongyu1231
+//@@author Hongyu1231
 package seedu.equipmentmaster.storage;
 
 import org.junit.jupiter.api.Test;

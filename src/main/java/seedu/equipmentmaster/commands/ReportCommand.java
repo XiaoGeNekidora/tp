@@ -10,7 +10,6 @@ import seedu.equipmentmaster.module.Module;
 import seedu.equipmentmaster.modulelist.ModuleList;
 import java.util.ArrayList;
 
-// @@author Hongyu1231
 /**
  * Generates specific reports for the equipment inventory.
  */
@@ -67,7 +66,6 @@ public class ReportCommand extends Command {
             ui.showMessage("Invalid report type. Currently supported: aging, lowstock, procurement.");
         }
     }
-    // @@author Hongyu1231
 
     private void executeLowStockReport(EquipmentList equipments, Ui ui) {
         ui.showMessage("Low Stock Alert (Items below minimum threshold):");
@@ -90,7 +88,7 @@ public class ReportCommand extends Command {
         }
     }
 
-    // @@author Hongyu1231
+    //@@author Hongyu1231
     private void executeAgingReport(EquipmentList equipments, Ui ui, Context context) {
         AcademicSemester targetSem;
         try {
@@ -134,7 +132,7 @@ public class ReportCommand extends Command {
         }
     }
 
-    // @@author
+    //@@author
 
     private void executeProcurementReport(Context context) {
         Ui ui = context.getUi();

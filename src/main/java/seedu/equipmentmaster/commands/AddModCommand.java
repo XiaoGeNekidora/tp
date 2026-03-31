@@ -1,4 +1,4 @@
-// @@author Hongyu1231
+//@@author Hongyu1231
 
 package seedu.equipmentmaster.commands;
 

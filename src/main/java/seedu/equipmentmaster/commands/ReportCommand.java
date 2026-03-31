@@ -88,7 +88,7 @@ public class ReportCommand extends Command {
         }
     }
 
-    // @@author Hongyu1231
+    //@@author Hongyu1231
     private void executeAgingReport(EquipmentList equipments, Ui ui, Context context) {
         AcademicSemester targetSem;
         try {
@@ -132,7 +132,7 @@ public class ReportCommand extends Command {
         }
     }
 
-    // @@author
+    //@@author
 
     private void executeProcurementReport(Context context) {
         Ui ui = context.getUi();

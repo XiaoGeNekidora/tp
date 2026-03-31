@@ -3,7 +3,8 @@
 ## Acknowledgements
 
 * **AddressBook-Level3 (AB3):** This project was initially inspired by and adapted from the AddressBook-Level3 project created by the [SE-EDU initiative](https://se-education.org). We thank the AB3 team for providing a robust architectural template for Java-based CLI applications.
-* **Libraries Used:** * [JUnit 5](https://junit.org/junit5/) - For comprehensive unit and integration testing.
+* **Libraries Used:** 
+  * [JUnit 5](https://junit.org/junit5/) - For comprehensive unit and integration testing.
 
 ## Design & implementation
 
@@ -191,6 +192,35 @@ During execution:
 #### 5. Future Implementations (Beyond v2.1)
 To further enhance the automated lab management experience, the following feature is planned for future iterations:
 * **Automated Procurement Generation:** Building upon the Aging Equipment Report and the Module Tracking System (pax sizes), the system will hypothetically cross-reference aging items with next semester's expected student intake to automatically generate a formatted PDF "Purchase Request Form", detailing exactly how many new boards are needed to replace dead stock and meet student quotas.
+//@@author XiaoGeNekidora
+---
+
+### Procurement Report (Automated Restocking)
+
+#### 1. Overview
+The Procurement Report is a computed report that calculates recommended semesterly purchase quantities. It aggregates demand from enrolled student numbers across different modules, applies a configured safety buffer, and compares the result against current stock to produce a "To Buy" list.
+
+#### 2. Implementation Details
+The feature is integrated into the existing `ReportCommand` class to group all analytical logic in one place. The core logic resides in the `executeProcurementReport(Context)` method.
+
+The calculation follows this strict algorithm for each equipment item:
+1.  **Demand Aggregation**: The system iterates through the `moduleCodes` list associated with the equipment. It retrieves the latest enrollment numbers (pax) from the `ModuleList` and sums them up to determine the `Base Demand`.
+  *   *Orphaned Tag Handling*: If a module code exists in the equipment's tag list but has been deleted from the `ModuleList`, it is gracefully ignored to prevent `NullPointerException`.
+2.  **Buffer Application**: The `Base Demand` is multiplied by `(1 + bufferPercentage / 100.0)`.
+3.  **Indivisibility Rule**: The result is rounded up to the nearest whole number using `Math.ceil()`. You cannot purchase 0.5 of a board.
+4.  **Gap Analysis**: The system subtracts the *Total Quantity* (owned inventory) from the *Total Required*.
+  *   Note: It uses *Total Quantity* rather than *Available Quantity* because procurement decisions are based on total asset ownership, regardless of whether items are currently loaned out.
+5.  **Output**: If `To Buy > 0`, the item is flagged in the report.
+
+#### 3. Design Considerations
+**Alternative 1 (Current Implementation): Total Ownership vs. Demand**
+*   **How it works:** `To Buy = Required - Total_Quantity`.
+*   **Why it was chosen:** This is the correct accounting approach. If 10 items are needed, and we own 10 but 5 are loaned out, we do *not* need to buy more. We just need to wait for returns. Using `Available` would lead to massive over-purchasing during active semesters.
+
+**Alternative 2: Available Stock vs. Demand**
+*   **How it works:** `To Buy = Required - Available_Quantity`.
+*   **Why it was rejected:** As mentioned above, this leads to double-purchasing. If an item is temporarily loaned, it is still an asset we own. Procurement budgets should only be spent on actual inventory deficits, not temporary shortages.
+
 ---
 
 ### `UiTable`: Dynamic UI Table Generation Utility
@@ -215,7 +245,7 @@ Similarly, `HelpCommand` utilizes `UiTable` but enables the `hasHeader` flag, al
 #### 3. Class Diagram
 ![UiTable Class Diagram](images/uiTable.png)
 ---
-
+//@@author
 ## Product scope
 ### Target user profile
 

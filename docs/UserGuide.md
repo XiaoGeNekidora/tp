@@ -237,3 +237,5 @@ Removes a specific number of units from either the available or loaned pool.
 * **List Equipment:** `list`
 * **Help Manual:** `help`
 * **Procurement Report:** `report procurement`
+* **Tag Module:** `tag m/MODULE_NAME n/EQUIPMENT_NAME req/FRACTION`
+* **Untag Module:** `untag m/MODULE_NAME n/EQUIPMENT_NAME`

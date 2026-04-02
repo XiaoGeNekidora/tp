@@ -84,6 +84,11 @@ Sets the current academic semester of the system, which is used as the baseline 
 * **Example:** `setsem AY2025/26 Sem1`
 * **Smart Reminder:** If the semester changes and modules exist in the system, a warning will remind you to update enrollment numbers (`pax`) using `updatemod` to maintain report accuracy.
 
+#### Viewing the current academic semester: `getsem`
+Displays the currently configured academic semester of the system. This is highly useful to verify the baseline timeline the system is using before you generate an aging report.
+* **Format:** `getsem`
+* **Example:** `getsem`
+
 #### Generating the Aging Report: `report aging`
 Scans the inventory and generates a report of all equipment whose age (calculated from their purchase semester to the current semester) meets or exceeds their defined lifespan.
 * **Format:** `report aging [AY[YYYY]/[YY] Sem[1/2]]`
@@ -93,8 +98,12 @@ Scans the inventory and generates a report of all equipment whose age (calculate
 
 ---
 
-### 5. Procurement Report
-Forecast your laboratory equipment needs for the upcoming semester to justify budgeting and purchasing requests.
+### 5. Advanced Inventory Reports
+Forecast your laboratory equipment needs and proactively identify critical shortages to justify budgeting and purchasing requests.
+
+#### Generating the Low Stock Report: `report lowstock`
+Scans your entire inventory and generates a report of all equipment where the current available quantity has dropped strictly below its configured minimum threshold (`min/`). This allows you to quickly identify immediate shortages before a busy lab session.
+* **Format:** `report lowstock`
 
 #### Setting a Safety Buffer: `setbuffer`
 Sets a percentage safety buffer on specific equipment. This ensures you buy slightly more than the baseline module enrollments to account for potential damage, loss, or unexpected student increases.
@@ -117,7 +126,7 @@ If `STM32` boards are needed for `CG2111A` (150 pax) and `CS2113` (50 pax), the 
 
 ---
 
-### 5. Equipment Status Management
+### 6. Equipment Status Management
 
 #### Updating equipment loan status: `setstatus`
 Updates the loaned or available count of an equipment item to reflect real-time borrowing and return activity. You can target equipment by name or by its 1-based index in the list.
@@ -133,7 +142,7 @@ Updates the loaned or available count of an equipment item to reflect real-time 
 
 ---
 
-### 6. Core Commands
+### 7. Core Commands
 These commands form the foundation of navigating and managing your current lab inventory. List-style outputs are beautifully formatted using responsive ASCII tables for maximum readability.
 
 #### Listing all equipment: `list`
@@ -158,6 +167,10 @@ Removes a specific number of units from either the available or loaned pool.
   * `STATUS` must be either `available` or `loaned`.
 * **Example:** `delete 1 q/5 s/available`
 * **Logic:** If this action causes stock to hit the minimum threshold, a low stock alert will be displayed immediately.
+
+#### Exiting the application: `bye`
+Exits the Equipment Master application safely and gracefully.
+* **Format:** `bye`
 
 ---
 
@@ -192,9 +205,11 @@ Removes a specific number of units from either the available or loaned pool.
 
 **A:** No, the enhanced `find` command is case-insensitive and supports partial keyword matching. For example, searching `find STM` will return "STM32". Additionally, it matches against the module codes stored on each equipment record, so searching `find CG2111A` will return all equipment associated with that specific course.
 
+
 **Q: Will the system warn me if I add new equipment that is already below the threshold?**
 
 **A:** Yes. If you use the `add` command with a `min/` flag (e.g., `add n/Resistor q/10 min/15`), the system will trigger a `!!! LOW STOCK ALERT` immediately upon addition.
+
 
 **Q: The student enrollment size for a module just increased. Do I need to delete and recreate the module to update the numbers?**
 
@@ -214,6 +229,7 @@ Removes a specific number of units from either the available or loaned pool.
 **Q: What happens if I accidentally enter a negative number for the student enrollment (pax) when adding or updating a module?**
 
 **A:** The system has built-in defensive validation. It will immediately reject negative numbers or invalid text inputs for the pax, displaying an informative error message to help you correct the format, ensuring your lab data remains strictly accurate.
+
 
 **Q: A student is returning equipment but I only remember the item's position in the list, not its full name. Do I need to look up the name first?**
 
@@ -239,3 +255,6 @@ Removes a specific number of units from either the available or loaned pool.
 * **Procurement Report:** `report procurement`
 * **Tag Module:** `tag m/MOD_NAME n/EQ_NAME req/FRACTION`
 * **Untag Module:** `untag m/MOD_NAME n/EQ_NAME`
+* **Get Semester:** `getsem`
+* **Low Stock Report:** `report lowstock`
+* **Exit Application:** `bye`

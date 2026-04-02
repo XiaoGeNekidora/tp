@@ -363,7 +363,6 @@ Execution flow of `TagCommand#execute(Context)`:
 
 6.  **Persistence:** It triggers `Storage#saveModules(modules)` to save the new relationship.
 
-
 #### 3. UML Diagram
 
 ![Tag Command Sequence Diagrams](images/TagCommand.png)
@@ -493,14 +492,39 @@ Whether you are managing shared pools of STM32 boards across different modules (
 
 | Version | As a ... | I want to ... | So that I can ... |
 |---------|----------|---------------|-------------------|
-| **v1.0** | new technician | view a list of all available commands | quickly learn how to operate the system without memorizing the user guide. |
-| **v1.0** | lab technician | add a new equipment item to the inventory | maintain an up-to-date digital record of all lab assets. |
-| **v1.0** | lab technician | update the status of an equipment to "loaned" | hold students accountable and know exactly what is currently out of the lab. |
-| **v1.0** | lab technician | delete a broken or lost equipment from the system | ensure the inventory count reflects the actual usable stock. |
-| **v2.0** | lab manager | search for equipment by its assigned module code (e.g., `CG2111A`) | quickly retrieve all development boards and sensors required for an upcoming class session. |
-| **v2.0** | lab manager | register a new academic module and its expected student pax | establish a baseline for how much equipment will be demanded this semester. |
-| **v2.0** | lab technician | generate an aging equipment report | proactively identify devices that have exceeded their lifespan and justify budget requests for replacements. |
-| **v2.0** | power user | link a specific equipment requirement ratio to a module | automatically scale and forecast the lab's inventory needs when student enrollment sizes change. |
+| **v1.0** | first-time user | view document/help information of each command | see the syntax and examples without looking up an external manual. |
+| **v1.0** | first-time user | receive a clear text error (e.g., "Error: ID not found") | know exactly which part of my command was wrong and correct it immediately. |
+| **v1.0** | technician | add a new type of equipment | catalog new inventory arrivals and start tracking them. |
+| **v1.0** | technician | delete a type of equipment | remove obsolete or entirely decommissioned items from the system registry. |
+| **v1.0** | technician | see a list of items | view data that is aligned and readable even in a simple terminal window. |
+| **v1.0** | technician | update the quantity of a specific item | ensure the system accurately reflects the current physical stock after a shipment. |
+| **v1.0** | technician | set the status of one equipment to available/loaned | check what items are currently loaned by students and what are still in the lab. |
+| **v1.0** | technician | update the detailed status of an equipment (e.g. Available, Damaged, Under Maintenance) | ensure only functional boards are distributed to students and broken items are automatically deducted from the "Available" count. |
+| **v2.0** | beginner user | input student numbers (pax) for each module | allow the system to update the "Required Quantity" baseline for the new semester. |
+| **v2.0** | intermediate user | tag boards with Module Codes (e.g., EE2026, CG2028) | calculate stock shortages specific to each course, rather than just looking at the total count. |
+| **v2.0** | intermediate user | use the search command with a keyword | find a student or item ID even if I only remember part of the name. |
+| **v2.0** | intermediate user | use flags (e.g., `list --available --stm32`) to filter the inventory list | filter the inventory instantly without having my screen cluttered by irrelevant items. |
+| **v2.0** | technician | link an item to a student | keep a strict record and not forget who loaned the equipment. |
+| **v2.0** | technician | link an item to a lab/place | easily remember where the equipment is physically located in the real world. |
+| **v2.0** | technician | add, rename, or delete labs or places | keep track of and update information about the logistics infrastructure. |
+| **v2.0** | technician | bulk move all items from one lab to another | quickly reflect logistical changes in the physical world within the digital system. |
+| **v2.0** | technician | record the "Purchase Date" and "Lifespan" (e.g., 5 years) with the equipment | enable the system to track the age of every board automatically. |
+| **v2.0** | intermediate user | view an "Aging Report" listing boards that are older than their lifespan | visually inspect these "High Risk" boards before they actually fail during a lab. |
+| **v3.0** | technician | view a history of repairs for a specific board type | identify if a specific batch of boards (e.g., "Basys3 2024 Batch") is defective and should be returned to the vendor. |
+| **v3.0** | technician | set a "minimum quantity" threshold for critical items (like USB cables) | get alerted when stock runs low before I completely run out during a busy lab session. |
+| **v3.0** | technician | start a "Stocktake Mode" to verify items shelf-by-shelf | reconcile the system's data with what is actually on the shelf and identify missing items annually. |
+| **v3.0** | technician | record all operations in an audit log and view the log | track system activities, ensure accountability, and report to my department head on who did what and when. |
+| **v3.0** | technician | generate a "Stock vs. Enrollment" ratio report | mathematically prove to the department that we need to procure more boards. |
+| **v3.0** | Excel user | export data to an Excel sheet (`.csv` / `.xlsx`) | generate a file compatible with Excel for official department reporting and archiving. |
+| **v3.0** | intermediate user | view and use command history (e.g., UP arrow) | quickly repeat the last transaction without re-typing everything. |
+| **v3.0** | expert user | toggle verbose mode off (Quiet Mode) | keep the terminal clean and uncluttered from success messages during rapid data entry. |
+| **v3.0** | expert user | use shortcuts or flags to execute commands | skip confirmation prompts and force the action immediately to save time. |
+| **v3.0** | expert user | perform multiple actions at once using chain commands | perform complex operations in a single line of instruction. |
+| **v3.0** | expert user | batch process loans | handle 50+ loans at once by scanning barcodes into a text file first. |
+| **v3.0** | expert user | set a "Safety Buffer" percentage (e.g., 10%) in the config | ensure the purchase recommendation includes extra spares for unexpected mid-sem damage. |
+| **v3.0** | expert user | filter inventory by "Remaining Lifespan" (e.g., `list --eol-soon`) | easily identify which batch of boards needs to be phased out next year. |
+| **v3.0** | expert user | see a suggestion of purchase number based on existing data | have the system automatically calculate `(Enrollment Ratio - Working Stock - Expiring Boards)` to suggest a purchase number. |
+| **v3.0** | expert user | auto-generate a Budget Request Text based on the recommendation | simply copy-paste the generated data directly into my email to the department head. |
 
 ## Non-Functional Requirements
 
@@ -549,3 +573,68 @@ To test the system with pre-populated data without typing everything manually:
   * **Expected:** The system confirms the current semester has been updated.
 3. **Test Case:** Type `report aging` and press Enter.
   * **Expected:** The system uses the currently set academic semester (from `Context#getCurrentSemester()`) to calculate ages, and prints a formatted list of *only* the equipment that has exceeded or reached its expected lifespan.
+
+### 5. Testing the Module Tracking System
+1. **Adding a Module:**
+  * **Test Case:** Type `addmod n/CS2113 pax/150` and press Enter.
+  * **Expected:** System successfully adds the module `CS2113` with a student capacity of 150.
+2. **Listing Modules:**
+  * **Test Case:** Type `listmod` and press Enter.
+  * **Expected:** Displays a formatted list of all registered modules, including `CS2113`.
+3. **Updating Module Pax:**
+  * **Test Case:** Type `updatemod n/CS2113 pax/200`.
+  * **Expected:** The student enrollment size for `CS2113` is updated to 200. Verification can be done by typing `listmod` again.
+4. **Deleting a Module:**
+  * **Test Case:** Type `delmod n/CS2113`.
+  * **Expected:** The module `CS2113` is removed from the system. (Safe dereferencing ensures no equipment is deleted).
+
+### 6. Testing Equipment Core Operations (CRUD)
+1. **Adding Equipment:**
+  * **Test Case:** Type `add n/Oscilloscope q/10 bought/AY24/25 Sem1 min/2 life/5`.
+  * **Expected:** The equipment "Oscilloscope" is added with an available quantity of 10.
+2. **Listing Equipment:**
+  * **Test Case:** Type `list`.
+  * **Expected:** Displays the full inventory list.
+3. **Deleting Equipment:**
+  * **Test Case:** Type `delete n/Oscilloscope q/2 s/AVAILABLE` (or use index: `delete 1 q/2 s/AVAILABLE`).
+  * **Expected:** The available quantity of the Oscilloscope is reduced by 2.
+
+### 7. Testing Status, Thresholds, and Buffers
+1. **Setting Equipment Status:**
+  * **Test Case:** Type `setstatus n/Oscilloscope q/3 s/LOANED`.
+  * **Expected:** 3 Oscilloscopes are moved from "AVAILABLE" to "LOANED" status.
+2. **Setting Minimum Threshold:**
+  * **Test Case:** Type `setmin n/Oscilloscope min/5`.
+  * **Expected:** The minimum threshold for Oscilloscope is updated to 5.
+3. **Setting Buffer Percentage:**
+  * **Test Case:** Type `setbuffer n/Oscilloscope b/15`.
+  * **Expected:** The safety buffer for Oscilloscope is updated to 15%.
+
+### 8. Testing Additional Reports
+1. **Low Stock Report:**
+  * **Prerequisite:** Ensure at least one item's available quantity is strictly less than its minimum threshold (e.g., available=3, min=5).
+  * **Test Case:** Type `report lowstock`.
+  * **Expected:** System lists only the items that have fallen below their set minimum threshold, alerting the technician of shortages.
+2. **Procurement Report:**
+  * **Test Case:** Type `report procurement`.
+  * **Expected:** System calculates and displays a formatted report suggesting how many new units need to be purchased based on current stock, buffers, and module demands.
+
+### 9. Testing Relational Mapping
+1. **Tagging Equipment to a Module:**
+  * **Prerequisite:** Ensure `CG2111A` (Module) and `STM32` (Equipment) exist.
+  * **Test Case:** Type `tag m/CG2111A n/STM32 req/0.5`.
+  * **Expected:** The system links STM32 to CG2111A with a requirement ratio of 0.5.
+2. **Untagging Equipment:**
+  * **Test Case:** Type `untag m/CG2111A n/STM32`.
+  * **Expected:** The relational link between the module and the equipment is removed.
+
+### 10. Testing Utilities and Context
+1. **Checking Current Semester:**
+  * **Test Case:** Type `getsem`.
+  * **Expected:** System displays the currently active academic semester.
+2. **Help Command:**
+  * **Test Case:** Type `help`.
+  * **Expected:** System outputs a summary of all available commands and their syntax.
+3. **Exiting the Application:**
+  * **Test Case:** Type `bye`.
+  * **Expected:** System displays a farewell message and the application terminates gracefully.

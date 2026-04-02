@@ -8,6 +8,7 @@ import seedu.equipmentmaster.storage.Storage;
 import seedu.equipmentmaster.ui.Ui;
 
 import static seedu.equipmentmaster.common.Messages.MESSAGE_INVALID_SET_STATUS_FORMAT;
+import static seedu.equipmentmaster.common.Messages.MESSAGE_NAME_CONTAINS_RESERVED_CHARS;
 
 /**
  * Represents a command to update the status (loaned/available) of equipment.
@@ -96,6 +97,12 @@ public class SetStatusCommand extends Command {
 
         if (name.isEmpty()) {
             throw new EquipmentMasterException("Equipment name cannot be empty.");
+        }
+
+        if (name.contains("|") || name.contains(",") || name.contains("=")) {
+            throw new EquipmentMasterException(
+                    MESSAGE_NAME_CONTAINS_RESERVED_CHARS
+            );
         }
 
         int quantity;

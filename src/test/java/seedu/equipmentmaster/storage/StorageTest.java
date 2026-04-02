@@ -15,6 +15,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -168,5 +169,249 @@ public class StorageTest {
         assertEquals(1, loadedList.getModules().size());
         assertEquals("CG2028", loadedList.getModules().get(0).getName());
         assertEquals(120, loadedList.getModules().get(0).getPax());
+    }
+
+    @Test
+    public void save_ioException_showsErrorMessage() {
+        // Create storage with an invalid file path (directory doesn't exist and can't be created)
+        Path invalidPath = tempDir.resolve("nonexistent/deep/path/equipment.txt");
+        Storage storage = new Storage(
+                invalidPath.toString(),
+                ui,
+                tempDir.resolve("test_set.txt").toString(),
+                tempDir.resolve("test_mod.txt").toString()
+        );
+
+        ArrayList<Equipment> equipments = new ArrayList<>();
+        equipments.add(new Equipment("TestItem", 10, 10, 0));
+
+        // Should not throw exception, just show error message
+        storage.save(equipments);
+        // Test passes if no exception is thrown
+    }
+
+    @Test
+    public void parseEquipment_nullLine_returnsNull() {
+        Storage storage = createStorage();
+
+        // Use reflection or create a test subclass to access private method
+        // Alternative: test via load() with malformed data
+        Path testFile = tempDir.resolve("null_test.txt");
+
+        try (FileWriter writer = new FileWriter(testFile.toFile())) {
+            writer.write("\n"); // Empty line
+        } catch (IOException e) {
+            fail("Setup failed: " + e.getMessage());
+        }
+
+        Storage testStorage = new Storage(
+                testFile.toString(),
+                ui,
+                tempDir.resolve("test_set.txt").toString(),
+                tempDir.resolve("test_mod.txt").toString()
+        );
+
+        ArrayList<Equipment> loaded = testStorage.load();
+        assertEquals(0, loaded.size()); // Empty line should be skipped
+    }
+
+    @Test
+    public void parseEquipment_missingFields_returnsNull() throws IOException {
+        Path testFile = tempDir.resolve("missing_fields.txt");
+
+        // Line missing some fields (should cause parse to fail and return null)
+        try (FileWriter writer = new FileWriter(testFile.toFile())) {
+            writer.write("STM32 | 50 | 45\n"); // Missing many fields
+        }
+
+        Storage storage = new Storage(
+                testFile.toString(),
+                ui,
+                tempDir.resolve("test_set.txt").toString(),
+                tempDir.resolve("test_mod.txt").toString()
+        );
+
+        ArrayList<Equipment> loaded = storage.load();
+
+        // Should skip corrupted line
+        assertEquals(0, loaded.size());
+    }
+
+    @Test
+    public void saveSettings_ioException_showsErrorMessage() {
+        // Create storage with invalid settings file path
+        Path invalidPath = tempDir.resolve("nonexistent/deep/path/setting.txt");
+        Storage storage = new Storage(
+                tempDir.resolve("test_eq.txt").toString(),
+                ui,
+                invalidPath.toString(),
+                tempDir.resolve("test_mod.txt").toString()
+        );
+
+        try {
+            AcademicSemester sem = new AcademicSemester("AY2025/26 Sem1");
+            storage.saveSettings(sem);
+            // Test passes if no exception is thrown (error message is shown)
+        } catch (EquipmentMasterException e) {
+            fail("Should not throw exception: " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void loadSettings_fileExistsWithEmptyContent_returnsDefault() throws IOException {
+        Path settingFile = tempDir.resolve("empty_setting.txt");
+
+        try (FileWriter writer = new FileWriter(settingFile.toFile())) {
+            writer.write(""); // Empty file
+        }
+
+        Storage storage = new Storage(
+                tempDir.resolve("test_eq.txt").toString(),
+                ui,
+                settingFile.toString(),
+                tempDir.resolve("test_mod.txt").toString()
+        );
+
+        String loaded = storage.loadSettings();
+        assertEquals("AY2024/25 Sem1", loaded);
+    }
+
+    @Test
+    public void loadSettings_fileExistsWithWhitespace_returnsTrimmed() throws IOException {
+        Path settingFile = tempDir.resolve("whitespace_setting.txt");
+
+        try (FileWriter writer = new FileWriter(settingFile.toFile())) {
+            writer.write("  AY2025/26 Sem2  \n");
+        }
+
+        Storage storage = new Storage(
+                tempDir.resolve("test_eq.txt").toString(),
+                ui,
+                settingFile.toString(),
+                tempDir.resolve("test_mod.txt").toString()
+        );
+
+        String loaded = storage.loadSettings();
+        assertEquals("AY2025/26 Sem2", loaded);
+    }
+
+    @Test
+    public void loadModules_fileWithEmptyLines_skipsEmptyLines() throws IOException, EquipmentMasterException {
+        Path moduleFile = tempDir.resolve("empty_lines_modules.txt");
+
+        try (FileWriter writer = new FileWriter(moduleFile.toFile())) {
+            writer.write("\n");
+            writer.write("CG2111A | 150\n");
+            writer.write("\n");
+            writer.write("EE2026 | 200\n");
+            writer.write("\n");
+        }
+
+        Storage storage = new Storage(
+                tempDir.resolve("test_eq.txt").toString(),
+                ui,
+                tempDir.resolve("test_set.txt").toString(),
+                moduleFile.toString()
+        );
+
+        ModuleList loaded = storage.loadModules();
+
+        assertEquals(2, loaded.getModules().size());
+    }
+
+    @Test
+    public void loadModules_withRequirements_success() throws IOException, EquipmentMasterException {
+        Path moduleFile = tempDir.resolve("modules_with_reqs.txt");
+
+        try (FileWriter writer = new FileWriter(moduleFile.toFile())) {
+            writer.write("CG2111A | 150 | STM32=1.0,HDMI=0.5\n");
+        }
+
+        Storage storage = new Storage(
+                tempDir.resolve("test_eq.txt").toString(),
+                ui,
+                tempDir.resolve("test_set.txt").toString(),
+                moduleFile.toString()
+        );
+
+        ModuleList loaded = storage.loadModules();
+
+        assertEquals(1, loaded.getModules().size());
+        Module module = loaded.getModules().get(0);
+        assertEquals("CG2111A", module.getName());
+        assertEquals(150, module.getPax());
+        assertEquals(2, module.getEquipmentRequirements().size());
+    }
+
+    @Test
+    public void loadModules_withInvalidRatio_skipsThatRequirement() throws IOException, EquipmentMasterException {
+        Path moduleFile = tempDir.resolve("invalid_ratio_modules.txt");
+
+        try (FileWriter writer = new FileWriter(moduleFile.toFile())) {
+            writer.write("CG2111A | 150 | STM32=1.0,HDMI=-0.5,OSC=2.0\n");
+        }
+
+        Storage storage = new Storage(
+                tempDir.resolve("test_eq.txt").toString(),
+                ui,
+                tempDir.resolve("test_set.txt").toString(),
+                moduleFile.toString()
+        );
+
+        ModuleList loaded = storage.loadModules();
+
+        Module module = loaded.getModules().get(0);
+        // Should only have valid ratios (STM32 and OSC, not HDMI with negative)
+        assertEquals(2, module.getEquipmentRequirements().size());
+    }
+
+    @Test
+    public void loadModules_withMalformedRequirement_skipsIt() throws IOException, EquipmentMasterException {
+        Path moduleFile = tempDir.resolve("malformed_req_modules.txt");
+
+        try (FileWriter writer = new FileWriter(moduleFile.toFile())) {
+            writer.write("CG2111A | 150 | STM32=1.0,HDMI=abc,OSC=2.0\n");
+        }
+
+        Storage storage = new Storage(
+                tempDir.resolve("test_eq.txt").toString(),
+                ui,
+                tempDir.resolve("test_set.txt").toString(),
+                moduleFile.toString()
+        );
+
+        ModuleList loaded = storage.loadModules();
+
+        Module module = loaded.getModules().get(0);
+        // Should only have valid numeric ratios
+        assertEquals(2, module.getEquipmentRequirements().size());
+    }
+
+    @Test
+    public void saveModules_withRequirements_success() throws EquipmentMasterException, IOException {
+        Path moduleFile = tempDir.resolve("save_with_reqs.txt");
+
+        Storage storage = new Storage(
+                tempDir.resolve("test_eq.txt").toString(),
+                ui,
+                tempDir.resolve("test_set.txt").toString(),
+                moduleFile.toString()
+        );
+
+        ModuleList moduleList = new ModuleList();
+        Module module = new Module("CG2111A", 150);
+        module.addEquipmentRequirement("STM32", 1.0);
+        module.addEquipmentRequirement("HDMI", 0.5);
+        moduleList.addModule(module);
+
+        storage.saveModules(moduleList);
+
+        // Verify file content
+        try (Scanner scanner = new Scanner(moduleFile)) {
+            String line = scanner.nextLine();
+            assertTrue(line.contains("CG2111A | 150 |"));
+            assertTrue(line.contains("STM32=1.0"));
+            assertTrue(line.contains("HDMI=0.5"));
+        }
     }
 }

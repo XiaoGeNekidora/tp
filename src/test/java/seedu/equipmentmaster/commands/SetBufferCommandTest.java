@@ -13,6 +13,7 @@ import seedu.equipmentmaster.modulelist.ModuleList;
 import seedu.equipmentmaster.semester.AcademicSemester;
 import seedu.equipmentmaster.storage.Storage;
 import seedu.equipmentmaster.ui.Ui;
+import static seedu.equipmentmaster.common.Messages.MESSAGE_INVALID_SETBUFFER_FORMAT;
 
 import java.util.ArrayList;
 
@@ -204,6 +205,135 @@ public class SetBufferCommandTest {
             assertTrue(false, "Expected EquipmentMasterException was not thrown");
         } catch (EquipmentMasterException e) {
             assertTrue(e.getMessage().contains("Please specify either name (n/) OR index (i/), not both"));
+        }
+    }
+
+    @Test
+    public void parse_negativeBufferPercentage_throwsException() {
+        try {
+            SetBufferCommand.parse("setbuffer n/STM32 b/-10");
+            assertTrue(false, "Expected EquipmentMasterException was not thrown");
+        } catch (EquipmentMasterException e) {
+            assertEquals("Buffer percentage cannot be negative.", e.getMessage());
+        }
+    }
+
+    @Test
+    public void parse_missingBFlag_throwsException() {
+        try {
+            SetBufferCommand.parse("setbuffer n/STM32");
+            assertTrue(false, "Expected EquipmentMasterException was not thrown");
+        } catch (EquipmentMasterException e) {
+            assertEquals(MESSAGE_INVALID_SETBUFFER_FORMAT, e.getMessage());
+        }
+    }
+
+    @Test
+    public void parse_missingNameAndIndexFlags_throwsException() {
+        try {
+            SetBufferCommand.parse("setbuffer b/10");
+            assertTrue(false, "Expected EquipmentMasterException was not thrown");
+        } catch (EquipmentMasterException e) {
+            assertEquals(MESSAGE_INVALID_SETBUFFER_FORMAT, e.getMessage());
+        }
+    }
+
+    @Test
+    public void parse_emptyName_throwsException() {
+        try {
+            SetBufferCommand.parse("setbuffer n/ b/10");
+            assertTrue(false, "Expected EquipmentMasterException was not thrown");
+        } catch (EquipmentMasterException e) {
+            assertEquals("Equipment name cannot be empty.", e.getMessage());
+        }
+    }
+
+    @Test
+    public void parse_emptyIndex_throwsException() {
+        try {
+            SetBufferCommand.parse("setbuffer i/ b/10");
+            assertTrue(false, "Expected EquipmentMasterException was not thrown");
+        } catch (EquipmentMasterException e) {
+            assertEquals("Equipment index cannot be empty.", e.getMessage());
+        }
+    }
+
+    @Test
+    public void parse_zeroIndex_throwsException() {
+        try {
+            SetBufferCommand.parse("setbuffer i/0 b/10");
+            assertTrue(false, "Expected EquipmentMasterException was not thrown");
+        } catch (EquipmentMasterException e) {
+            assertEquals("Index must be a positive number.", e.getMessage());
+        }
+    }
+
+    @Test
+    public void parse_nonNumericIndex_throwsException() {
+        try {
+            SetBufferCommand.parse("setbuffer i/abc b/10");
+            assertTrue(false, "Expected EquipmentMasterException was not thrown");
+        } catch (EquipmentMasterException e) {
+            assertEquals("Please enter a valid positive integer for index.", e.getMessage());
+        }
+    }
+
+    @Test
+    public void parse_nonNumericBuffer_throwsException() {
+        try {
+            SetBufferCommand.parse("setbuffer n/STM32 b/abc");
+            assertTrue(false, "Expected EquipmentMasterException was not thrown");
+        } catch (EquipmentMasterException e) {
+            assertEquals("Please enter a valid number for buffer percentage.", e.getMessage());
+        }
+    }
+
+    @Test
+    public void parse_emptyBufferValue_throwsException() {
+        try {
+            SetBufferCommand.parse("setbuffer n/STM32 b/");
+            assertTrue(false, "Expected EquipmentMasterException was not thrown");
+        } catch (EquipmentMasterException e) {
+            assertEquals(MESSAGE_INVALID_SETBUFFER_FORMAT, e.getMessage());
+        }
+    }
+
+    @Test
+    public void parse_bufferValueAtEnd_extractsCorrectly() throws EquipmentMasterException {
+        EquipmentList equipments = new EquipmentList();
+        Ui ui = new Ui();
+        Storage storage = new Storage(TEST_FILE_PATH, ui, TEST_SETTING_FILE_PATH, TEST_MODULE_FILE_PATH);
+        ModuleList moduleList = new ModuleList();
+
+        AddCommand addCommand = new AddCommand("TestDevice", 10);
+        AcademicSemester currentSystemSemester = new AcademicSemester("AY2024/25 Sem1");
+        Context context = new Context(equipments, moduleList, ui, storage, currentSystemSemester);
+        addCommand.execute(context);
+
+        SetBufferCommand command = SetBufferCommand.parse("setbuffer n/TestDevice b/30");
+        command.execute(context);
+
+        Equipment equipment = equipments.getEquipment(0);
+        assertEquals(30.0, equipment.getBufferPercentage(), 0.0001);
+    }
+
+    @Test
+    public void constructor_negativeIndex_throwsIllegalArgumentException() {
+        try {
+            SetBufferCommand command = new SetBufferCommand(0, 10.0);
+            assertTrue(false, "Expected IllegalArgumentException was not thrown");
+        } catch (IllegalArgumentException e) {
+            assertTrue(e.getMessage().contains("Index must be positive"));
+        }
+    }
+
+    @Test
+    public void constructor_negativePercentage_throwsIllegalArgumentException() {
+        try {
+            SetBufferCommand command = new SetBufferCommand(1, -5.0);
+            assertTrue(false, "Expected IllegalArgumentException was not thrown");
+        } catch (IllegalArgumentException e) {
+            assertEquals("Buffer percentage cannot be negative.", e.getMessage());
         }
     }
 }

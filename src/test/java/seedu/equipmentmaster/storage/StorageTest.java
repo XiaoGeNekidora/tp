@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -173,11 +175,22 @@ public class StorageTest {
 
     @Test
     public void save_ioException_showsErrorMessage() {
-        // Create storage with an invalid file path (directory doesn't exist and can't be created)
-        Path invalidPath = tempDir.resolve("nonexistent/deep/path/equipment.txt");
+        Path barrierFile = tempDir.resolve("barrier.txt");
+        try {
+            barrierFile.toFile().createNewFile();
+        } catch (IOException e) {
+            fail("Setup failed: " + e.getMessage());
+        }
+
+        Path invalidPath = barrierFile.resolve("equipment.txt");
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        PrintStream printStream = new PrintStream(outputStream);
+        Ui testUi = new Ui(System.in, printStream);
+
         Storage storage = new Storage(
                 invalidPath.toString(),
-                ui,
+                testUi,
                 tempDir.resolve("test_set.txt").toString(),
                 tempDir.resolve("test_mod.txt").toString()
         );
@@ -185,34 +198,29 @@ public class StorageTest {
         ArrayList<Equipment> equipments = new ArrayList<>();
         equipments.add(new Equipment("TestItem", 10, 10, 0));
 
-        // Should not throw exception, just show error message
         storage.save(equipments);
-        // Test passes if no exception is thrown
+
+        String output = outputStream.toString();
+        assertTrue(output.contains("Error saving equipment data:"));
     }
 
     @Test
-    public void parseEquipment_nullLine_returnsNull() {
-        Storage storage = createStorage();
-
-        // Use reflection or create a test subclass to access private method
-        // Alternative: test via load() with malformed data
+    public void parseEquipment_nullLine_returnsNull() throws IOException {
         Path testFile = tempDir.resolve("null_test.txt");
 
         try (FileWriter writer = new FileWriter(testFile.toFile())) {
             writer.write("\n"); // Empty line
-        } catch (IOException e) {
-            fail("Setup failed: " + e.getMessage());
         }
 
-        Storage testStorage = new Storage(
+        Storage storage = new Storage(
                 testFile.toString(),
                 ui,
                 tempDir.resolve("test_set.txt").toString(),
                 tempDir.resolve("test_mod.txt").toString()
         );
 
-        ArrayList<Equipment> loaded = testStorage.load();
-        assertEquals(0, loaded.size()); // Empty line should be skipped
+        ArrayList<Equipment> loaded = storage.load();
+        assertEquals(0, loaded.size());
     }
 
     @Test
@@ -239,11 +247,22 @@ public class StorageTest {
 
     @Test
     public void saveSettings_ioException_showsErrorMessage() {
-        // Create storage with invalid settings file path
-        Path invalidPath = tempDir.resolve("nonexistent/deep/path/setting.txt");
+        Path barrierFile = tempDir.resolve("settings_barrier.txt");
+        try {
+            barrierFile.toFile().createNewFile();
+        } catch (IOException e) {
+            fail("Setup failed: " + e.getMessage());
+        }
+
+        Path invalidPath = barrierFile.resolve("setting.txt");
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        PrintStream printStream = new PrintStream(outputStream);
+        Ui testUi = new Ui(System.in, printStream);
+
         Storage storage = new Storage(
                 tempDir.resolve("test_eq.txt").toString(),
-                ui,
+                testUi,
                 invalidPath.toString(),
                 tempDir.resolve("test_mod.txt").toString()
         );
@@ -251,10 +270,12 @@ public class StorageTest {
         try {
             AcademicSemester sem = new AcademicSemester("AY2025/26 Sem1");
             storage.saveSettings(sem);
-            // Test passes if no exception is thrown (error message is shown)
         } catch (EquipmentMasterException e) {
             fail("Should not throw exception: " + e.getMessage());
         }
+
+        String output = outputStream.toString();
+        assertTrue(output.contains("Error saving settings:"));
     }
 
     @Test

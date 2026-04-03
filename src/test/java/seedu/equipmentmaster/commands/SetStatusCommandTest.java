@@ -1,7 +1,11 @@
 package seedu.equipmentmaster.commands;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
+import static seedu.equipmentmaster.common.Messages.MESSAGE_NAME_CONTAINS_RESERVED_CHARS;
+
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,10 +19,6 @@ import seedu.equipmentmaster.modulelist.ModuleList;
 import seedu.equipmentmaster.semester.AcademicSemester;
 import seedu.equipmentmaster.storage.Storage;
 import seedu.equipmentmaster.ui.Ui;
-import static seedu.equipmentmaster.common.Messages.MESSAGE_NAME_CONTAINS_RESERVED_CHARS;
-
-
-import java.nio.file.Path;
 
 public class SetStatusCommandTest {
 
@@ -28,234 +28,171 @@ public class SetStatusCommandTest {
     private Storage storage;
     private Ui ui;
     private EquipmentList equipments;
+    private ModuleList moduleList;
+    private AcademicSemester currentSystemSemester;
 
     @BeforeEach
-    public void setUp() {
+    public void setUp() throws EquipmentMasterException {
         ui = new Ui();
-        // Create a unique file in the temp directory for each test
         storage = new Storage(tempDir.resolve("test.txt").toString(),
                 ui, tempDir.resolve("test_setting.txt").toString(), tempDir.resolve("test_module.txt").toString());
         equipments = new EquipmentList();
+        moduleList = new ModuleList();
+        currentSystemSemester = new AcademicSemester("AY2024/25 Sem1");
+    }
+
+    private Context createContext() {
+        return new Context(equipments, moduleList, ui, storage, currentSystemSemester);
+    }
+
+    private void addEquipment(String name, int quantity, int available, int loaned) throws EquipmentMasterException {
+        Equipment eq = new Equipment(name, quantity, available, loaned);
+        equipments.addEquipment(eq);
+    }
+
+    private void addEquipmentWithSemester(String name, int quantity, int available, int loaned,
+                                          AcademicSemester sem, double lifespan) throws EquipmentMasterException {
+        Equipment eq = new Equipment(name, quantity, available, loaned, sem, lifespan, 0);
+        equipments.addEquipment(eq);
     }
 
     @Test
     public void executeByName_loanPositive_updates() throws EquipmentMasterException {
-        ModuleList moduleList = new ModuleList();
-        // Arrange
         AcademicSemester testSem = new AcademicSemester("AY2025/26 Sem2");
-        equipments.addEquipment(new Equipment("BasyS3 FPGA", 40, 40, 0, testSem, 5.0, 0));
-        SetStatusCommand command = new SetStatusCommand("BasyS3 FPGA", 5, "loaned");
+        addEquipmentWithSemester("Basys3 FPGA", 40, 40, 0, testSem, 5.0);
 
-        // Act
-        AcademicSemester currentSystemSemester = new AcademicSemester("AY2024/25 Sem1");
-        Context context = new Context(equipments, moduleList, ui, storage, currentSystemSemester);
-        command.execute(context);
+        SetStatusCommand command = new SetStatusCommand("Basys3 FPGA", 5, "loaned");
+        command.execute(createContext());
 
-        // Assert
         Equipment eq = equipments.getEquipment(0);
         assertEquals(35, eq.getAvailable());
         assertEquals(5, eq.getLoaned());
     }
 
     @Test
-    public void executeByName_loanNegative_noChange() {
-        ModuleList moduleList = new ModuleList();
-        // Arrange
-        equipments.addEquipment(new Equipment("BasyS3 FPGA", 40, 40, 0));
-        SetStatusCommand command = new SetStatusCommand("BasyS3 FPGA", -5, "loaned");
+    public void executeByName_loanNegative_noChange() throws EquipmentMasterException {
+        addEquipment("Basys3 FPGA", 40, 40, 0);
 
-        // Act
-        try {
-            AcademicSemester currentSystemSemester = new AcademicSemester("AY2024/25 Sem1");
-            Context context = new Context(equipments, moduleList, ui, storage, currentSystemSemester);
-            command.execute(context);
+        SetStatusCommand command = new SetStatusCommand("Basys3 FPGA", -5, "loaned");
+        command.execute(createContext());
 
-            // Assert
-            Equipment eq = equipments.getEquipment(0);
-            assertEquals(40, eq.getAvailable());
-            assertEquals(0, eq.getLoaned());
-        } catch (EquipmentMasterException e) {
-            fail("Test setup failed unexpectedly: " + e.getMessage());
-        }
+        Equipment eq = equipments.getEquipment(0);
+        assertEquals(40, eq.getAvailable());
+        assertEquals(0, eq.getLoaned());
     }
 
     @Test
     public void executeByIndex_returnPositive_updates() throws EquipmentMasterException {
-        ModuleList moduleList = new ModuleList();
-        // Arrange
         AcademicSemester testSem = new AcademicSemester("AY2025/26 Sem2");
-        equipments.addEquipment(new Equipment("BasyS3 FPGA", 40, 30, 10, testSem, 5.0, 0));
+        addEquipmentWithSemester("Basys3 FPGA", 40, 30, 10, testSem, 5.0);
+
         SetStatusCommand command = new SetStatusCommand(1, 3, "available");
+        command.execute(createContext());
 
-        // Act
-        AcademicSemester currentSystemSemester = new AcademicSemester("AY2024/25 Sem1");
-        Context context = new Context(equipments, moduleList, ui, storage, currentSystemSemester);
-        command.execute(context);
-
-        // Assert
         Equipment eq = equipments.getEquipment(0);
         assertEquals(33, eq.getAvailable());
         assertEquals(7, eq.getLoaned());
     }
 
     @Test
-    public void executeByIndex_returnNegative_noChange() {
-        ModuleList moduleList = new ModuleList();
-        // Arrange
-        equipments.addEquipment(new Equipment("BasyS3 FPGA", 40, 30, 10));
+    public void executeByIndex_returnNegative_noChange() throws EquipmentMasterException {
+        addEquipment("Basys3 FPGA", 40, 30, 10);
+
         SetStatusCommand command = new SetStatusCommand(1, -3, "available");
+        command.execute(createContext());
 
-        // Act
-        try {
-            AcademicSemester currentSystemSemester = new AcademicSemester("AY2024/25 Sem1");
-            Context context = new Context(equipments, moduleList, ui, storage, currentSystemSemester);
-            command.execute(context);
-
-            // Assert
-            Equipment eq = equipments.getEquipment(0);
-            assertEquals(30, eq.getAvailable());
-            assertEquals(10, eq.getLoaned());
-        } catch (EquipmentMasterException e) {
-            fail("Test setup failed unexpectedly: " + e.getMessage());
-        }
+        Equipment eq = equipments.getEquipment(0);
+        assertEquals(30, eq.getAvailable());
+        assertEquals(10, eq.getLoaned());
     }
 
     @Test
-    public void executeByName_loanExceedsAvailable_noChange() {
-        ModuleList moduleList = new ModuleList();
-        equipments.addEquipment(new Equipment("BasyS3 FPGA", 40, 10, 30));
-        SetStatusCommand command = new SetStatusCommand("BasyS3 FPGA", 20, "loaned");
+    public void executeByName_loanExceedsAvailable_noChange() throws EquipmentMasterException {
+        addEquipment("Basys3 FPGA", 40, 10, 30);
 
-        try {
-            AcademicSemester currentSystemSemester = new AcademicSemester("AY2024/25 Sem1");
-            Context context = new Context(equipments, moduleList, ui, storage, currentSystemSemester);
-            command.execute(context);
+        SetStatusCommand command = new SetStatusCommand("Basys3 FPGA", 20, "loaned");
+        command.execute(createContext());
 
-            Equipment eq = equipments.getEquipment(0);
-            assertEquals(10, eq.getAvailable());
-            assertEquals(30, eq.getLoaned());
-        } catch (EquipmentMasterException e) {
-            fail("Test setup failed unexpectedly: " + e.getMessage());
-        }
+        Equipment eq = equipments.getEquipment(0);
+        assertEquals(10, eq.getAvailable());
+        assertEquals(30, eq.getLoaned());
     }
 
     @Test
-    public void executeByName_returnExceedsLoaned_noChange() {
-        ModuleList moduleList = new ModuleList();
-        equipments.addEquipment(new Equipment("BasyS3 FPGA", 40, 35, 5));
-        SetStatusCommand command = new SetStatusCommand("BasyS3 FPGA", 10, "available");
+    public void executeByName_returnExceedsLoaned_noChange() throws EquipmentMasterException {
+        addEquipment("Basys3 FPGA", 40, 35, 5);
 
-        try {
-            AcademicSemester currentSystemSemester = new AcademicSemester("AY2024/25 Sem1");
-            Context context = new Context(equipments, moduleList, ui, storage, currentSystemSemester);
-            command.execute(context);
+        SetStatusCommand command = new SetStatusCommand("Basys3 FPGA", 10, "available");
+        command.execute(createContext());
 
-            Equipment eq = equipments.getEquipment(0);
-            assertEquals(35, eq.getAvailable());
-            assertEquals(5, eq.getLoaned());
-        } catch (EquipmentMasterException e) {
-            fail("Test setup failed unexpectedly: " + e.getMessage());
-        }
+        Equipment eq = equipments.getEquipment(0);
+        assertEquals(35, eq.getAvailable());
+        assertEquals(5, eq.getLoaned());
     }
 
     @Test
-    public void executeByName_equipmentNotFound_noChange() {
-        ModuleList moduleList = new ModuleList();
-        equipments.addEquipment(new Equipment("BasyS3 FPGA", 40, 40, 0));
+    public void executeByName_equipmentNotFound_noChange() throws EquipmentMasterException {
+        addEquipment("Basys3 FPGA", 40, 40, 0);
+
         SetStatusCommand command = new SetStatusCommand("NonExistent", 5, "loaned");
+        command.execute(createContext());
 
-        try {
-            AcademicSemester currentSystemSemester = new AcademicSemester("AY2024/25 Sem1");
-            Context context = new Context(equipments, moduleList, ui, storage, currentSystemSemester);
-            command.execute(context);
-
-            Equipment eq = equipments.getEquipment(0);
-            assertEquals(40, eq.getAvailable());
-            assertEquals(0, eq.getLoaned());
-        } catch (EquipmentMasterException e) {
-            fail("Test setup failed unexpectedly: " + e.getMessage());
-        }
+        Equipment eq = equipments.getEquipment(0);
+        assertEquals(40, eq.getAvailable());
+        assertEquals(0, eq.getLoaned());
     }
 
     @Test
-    public void executeByIndex_outOfBounds_noChange() {
-        ModuleList moduleList = new ModuleList();
-        equipments.addEquipment(new Equipment("BasyS3 FPGA", 40, 40, 0));
+    public void executeByIndex_outOfBounds_noChange() throws EquipmentMasterException {
+        addEquipment("Basys3 FPGA", 40, 40, 0);
+
         SetStatusCommand command = new SetStatusCommand(99, 5, "loaned");
+        command.execute(createContext());
 
-        try {
-            AcademicSemester currentSystemSemester = new AcademicSemester("AY2024/25 Sem1");
-            Context context = new Context(equipments, moduleList, ui, storage, currentSystemSemester);
-            command.execute(context);
-
-            Equipment eq = equipments.getEquipment(0);
-            assertEquals(40, eq.getAvailable());
-            assertEquals(0, eq.getLoaned());
-        } catch (EquipmentMasterException e) {
-            fail("Test setup failed unexpectedly: " + e.getMessage());
-        }
+        Equipment eq = equipments.getEquipment(0);
+        assertEquals(40, eq.getAvailable());
+        assertEquals(0, eq.getLoaned());
     }
 
     @Test
-    public void executeByIndex_zeroQuantity_noChange() {
-        ModuleList moduleList = new ModuleList();
-        equipments.addEquipment(new Equipment("BasyS3 FPGA", 40, 40, 0));
+    public void executeByIndex_zeroQuantity_noChange() throws EquipmentMasterException {
+        addEquipment("Basys3 FPGA", 40, 40, 0);
+
         SetStatusCommand command = new SetStatusCommand(1, 0, "loaned");
+        command.execute(createContext());
 
-        try {
-            AcademicSemester currentSystemSemester = new AcademicSemester("AY2024/25 Sem1");
-            Context context = new Context(equipments, moduleList, ui, storage, currentSystemSemester);
-            command.execute(context);
-
-            Equipment eq = equipments.getEquipment(0);
-            assertEquals(40, eq.getAvailable());
-            assertEquals(0, eq.getLoaned());
-        } catch (EquipmentMasterException e) {
-            fail("Test setup failed unexpectedly: " + e.getMessage());
-        }
+        Equipment eq = equipments.getEquipment(0);
+        assertEquals(40, eq.getAvailable());
+        assertEquals(0, eq.getLoaned());
     }
 
     @Test
-    public void executeByIndex_loanExceedsAvailable_noChange() {
-        ModuleList moduleList = new ModuleList();
-        equipments.addEquipment(new Equipment("BasyS3 FPGA", 40, 10, 30));
+    public void executeByIndex_loanExceedsAvailable_noChange() throws EquipmentMasterException {
+        addEquipment("Basys3 FPGA", 40, 10, 30);
+
         SetStatusCommand command = new SetStatusCommand(1, 20, "loaned");
+        command.execute(createContext());
 
-        try {
-            AcademicSemester currentSystemSemester = new AcademicSemester("AY2024/25 Sem1");
-            Context context = new Context(equipments, moduleList, ui, storage, currentSystemSemester);
-            command.execute(context);
-
-            Equipment eq = equipments.getEquipment(0);
-            assertEquals(10, eq.getAvailable());
-            assertEquals(30, eq.getLoaned());
-        } catch (EquipmentMasterException e) {
-            fail("Test setup failed unexpectedly: " + e.getMessage());
-        }
+        Equipment eq = equipments.getEquipment(0);
+        assertEquals(10, eq.getAvailable());
+        assertEquals(30, eq.getLoaned());
     }
 
     @Test
-    public void executeByIndex_returnExceedsLoaned_noChange() {
-        ModuleList moduleList = new ModuleList();
-        equipments.addEquipment(new Equipment("BasyS3 FPGA", 40, 35, 5));
+    public void executeByIndex_returnExceedsLoaned_noChange() throws EquipmentMasterException {
+        addEquipment("Basys3 FPGA", 40, 35, 5);
+
         SetStatusCommand command = new SetStatusCommand(1, 10, "available");
+        command.execute(createContext());
 
-        try {
-            AcademicSemester currentSystemSemester = new AcademicSemester("AY2024/25 Sem1");
-            Context context = new Context(equipments, moduleList, ui, storage, currentSystemSemester);
-            command.execute(context);
-
-            Equipment eq = equipments.getEquipment(0);
-            assertEquals(35, eq.getAvailable());
-            assertEquals(5, eq.getLoaned());
-        } catch (EquipmentMasterException e) {
-            fail("Test setup failed unexpectedly: " + e.getMessage());
-        }
+        Equipment eq = equipments.getEquipment(0);
+        assertEquals(35, eq.getAvailable());
+        assertEquals(5, eq.getLoaned());
     }
 
     @Test
     public void parseByName_validLoaned_success() throws EquipmentMasterException {
-        Command command = SetStatusCommand.parse("setstatus n/BasyS3 FPGA q/5 s/loaned");
+        Command command = SetStatusCommand.parse("setstatus n/Basys3 FPGA q/5 s/loaned");
         assertEquals(SetStatusCommand.class, command.getClass());
     }
 
@@ -267,78 +204,48 @@ public class SetStatusCommandTest {
 
     @Test
     public void parse_missingQFlag_throwsException() {
-        try {
-            SetStatusCommand.parse("setstatus n/BasyS3 FPGA 5 s/loaned");
-            fail("Expected EquipmentMasterException");
-        } catch (EquipmentMasterException e) {
-            // expected
-        }
+        assertThrows(EquipmentMasterException.class,
+                () -> SetStatusCommand.parse("setstatus n/Basys3 FPGA 5 s/loaned"));
     }
 
     @Test
     public void parse_invalidStatus_throwsException() {
-        try {
-            SetStatusCommand.parse("setstatus n/BasyS3 FPGA q/5 s/broken");
-            fail("Expected EquipmentMasterException");
-        } catch (EquipmentMasterException e) {
-            // expected
-        }
+        assertThrows(EquipmentMasterException.class,
+                () -> SetStatusCommand.parse("setstatus n/Basys3 FPGA q/5 s/broken"));
     }
 
     @Test
     public void parse_nonNumericQuantity_throwsException() {
-        try {
-            SetStatusCommand.parse("setstatus n/BasyS3 FPGA q/abc s/loaned");
-            fail("Expected EquipmentMasterException");
-        } catch (EquipmentMasterException e) {
-            // expected
-        }
+        assertThrows(EquipmentMasterException.class,
+                () -> SetStatusCommand.parse("setstatus n/Basys3 FPGA q/abc s/loaned"));
     }
 
     @Test
     public void parse_nonNumericIndex_throwsException() {
-        try {
-            SetStatusCommand.parse("setstatus abc q/5 s/loaned");
-            fail("Expected EquipmentMasterException");
-        } catch (EquipmentMasterException e) {
-            // expected
-        }
+        assertThrows(EquipmentMasterException.class,
+                () -> SetStatusCommand.parse("setstatus abc q/5 s/loaned"));
     }
 
     @Test
     public void parse_zeroQuantity_throwsException() {
-        try {
-            SetStatusCommand.parse("setstatus n/BasyS3 FPGA q/0 s/loaned");
-            fail("Expected EquipmentMasterException");
-        } catch (EquipmentMasterException e) {
-            // expected
-        }
+        assertThrows(EquipmentMasterException.class,
+                () -> SetStatusCommand.parse("setstatus n/Basys3 FPGA q/0 s/loaned"));
     }
 
     @Test
     public void parse_negativeIndex_throwsException() {
-        try {
-            SetStatusCommand.parse("setstatus -1 q/5 s/loaned");
-            fail("Expected EquipmentMasterException");
-        } catch (EquipmentMasterException e) {
-            // expected
-        }
+        assertThrows(EquipmentMasterException.class,
+                () -> SetStatusCommand.parse("setstatus -1 q/5 s/loaned"));
     }
 
     @Test
     public void executeByName_loanWithMixedCaseStatus_updates() throws EquipmentMasterException {
-        ModuleList moduleList = new ModuleList();
-        // Arrange
         AcademicSemester testSem = new AcademicSemester("AY2025/26 Sem2");
-        equipments.addEquipment(new Equipment("Oscilloscope", 20, 20, 0, testSem, 5.0, 0));
-        SetStatusCommand command = new SetStatusCommand("Oscilloscope", 3, "LOANED"); // Uppercase
+        addEquipmentWithSemester("Oscilloscope", 20, 20, 0, testSem, 5.0);
 
-        // Act
-        AcademicSemester currentSystemSemester = new AcademicSemester("AY2024/25 Sem1");
-        Context context = new Context(equipments, moduleList, ui, storage, currentSystemSemester);
-        command.execute(context);
+        SetStatusCommand command = new SetStatusCommand("Oscilloscope", 3, "LOANED");
+        command.execute(createContext());
 
-        // Assert
         Equipment eq = equipments.getEquipment(0);
         assertEquals(17, eq.getAvailable());
         assertEquals(3, eq.getLoaned());
@@ -346,58 +253,38 @@ public class SetStatusCommandTest {
 
     @Test
     public void executeByName_returnWithMixedCaseStatus_updates() throws EquipmentMasterException {
-        ModuleList moduleList = new ModuleList();
-        // Arrange
-        equipments.addEquipment(new Equipment("Multimeter", 15, 10, 5));
-        SetStatusCommand command = new SetStatusCommand("Multimeter", 2, "AVAILABLE"); // Uppercase
+        addEquipment("Multimeter", 15, 10, 5);
 
-        // Act
-        AcademicSemester currentSystemSemester = new AcademicSemester("AY2024/25 Sem1");
-        Context context = new Context(equipments, moduleList, ui, storage, currentSystemSemester);
-        command.execute(context);
+        SetStatusCommand command = new SetStatusCommand("Multimeter", 2, "AVAILABLE");
+        command.execute(createContext());
 
-        // Assert
         Equipment eq = equipments.getEquipment(0);
         assertEquals(12, eq.getAvailable());
         assertEquals(3, eq.getLoaned());
     }
 
     @Test
-    public void executeByName_invalidStatus_showsNoChange() {
-        ModuleList moduleList = new ModuleList();
-        equipments.addEquipment(new Equipment("PowerSupply", 10, 10, 0));
+    public void executeByName_invalidStatus_showsNoChange() throws EquipmentMasterException {
+        addEquipment("PowerSupply", 10, 10, 0);
+
         SetStatusCommand command = new SetStatusCommand("PowerSupply", 2, "damaged");
+        command.execute(createContext());
 
-        try {
-            AcademicSemester currentSystemSemester = new AcademicSemester("AY2024/25 Sem1");
-            Context context = new Context(equipments, moduleList, ui, storage, currentSystemSemester);
-            command.execute(context);
-
-            Equipment eq = equipments.getEquipment(0);
-            assertEquals(10, eq.getAvailable());
-            assertEquals(0, eq.getLoaned());
-        } catch (EquipmentMasterException e) {
-            fail("Test setup failed unexpectedly: " + e.getMessage());
-        }
+        Equipment eq = equipments.getEquipment(0);
+        assertEquals(10, eq.getAvailable());
+        assertEquals(0, eq.getLoaned());
     }
 
     @Test
-    public void executeByIndex_invalidStatus_showsNoChange() {
-        ModuleList moduleList = new ModuleList();
-        equipments.addEquipment(new Equipment("FunctionGen", 8, 8, 0));
+    public void executeByIndex_invalidStatus_showsNoChange() throws EquipmentMasterException {
+        addEquipment("FunctionGen", 8, 8, 0);
+
         SetStatusCommand command = new SetStatusCommand(1, 2, "reserved");
+        command.execute(createContext());
 
-        try {
-            AcademicSemester currentSystemSemester = new AcademicSemester("AY2024/25 Sem1");
-            Context context = new Context(equipments, moduleList, ui, storage, currentSystemSemester);
-            command.execute(context);
-
-            Equipment eq = equipments.getEquipment(0);
-            assertEquals(8, eq.getAvailable());
-            assertEquals(0, eq.getLoaned());
-        } catch (EquipmentMasterException e) {
-            fail("Test setup failed unexpectedly: " + e.getMessage());
-        }
+        Equipment eq = equipments.getEquipment(0);
+        assertEquals(8, eq.getAvailable());
+        assertEquals(0, eq.getLoaned());
     }
 
     @Test
@@ -414,92 +301,60 @@ public class SetStatusCommandTest {
 
     @Test
     public void parseByName_emptyName_throwsException() {
-        try {
-            SetStatusCommand.parse("setstatus n/ q/5 s/loaned");
-            fail("Expected EquipmentMasterException");
-        } catch (EquipmentMasterException e) {
-            assertEquals("Equipment name cannot be empty.", e.getMessage());
-        }
+        EquipmentMasterException exception = assertThrows(EquipmentMasterException.class,
+                () -> SetStatusCommand.parse("setstatus n/ q/5 s/loaned"));
+        assertEquals("Equipment name cannot be empty.", exception.getMessage());
     }
 
     @Test
     public void parseByName_missingStatus_throwsException() {
-        try {
-            SetStatusCommand.parse("setstatus n/Arduino q/5");
-            fail("Expected EquipmentMasterException");
-        } catch (EquipmentMasterException e) {
-            // expected - format invalid
-        }
+        assertThrows(EquipmentMasterException.class,
+                () -> SetStatusCommand.parse("setstatus n/Arduino q/5"));
     }
 
     @Test
     public void parseByName_missingQuantity_throwsException() {
-        try {
-            SetStatusCommand.parse("setstatus n/Arduino s/loaned");
-            fail("Expected EquipmentMasterException");
-        } catch (EquipmentMasterException e) {
-            // expected - format invalid
-        }
+        assertThrows(EquipmentMasterException.class,
+                () -> SetStatusCommand.parse("setstatus n/Arduino s/loaned"));
     }
 
     @Test
     public void parseByIndex_missingQuantity_throwsException() {
-        try {
-            SetStatusCommand.parse("setstatus 1 s/loaned");
-            fail("Expected EquipmentMasterException");
-        } catch (EquipmentMasterException e) {
-            // expected - format invalid
-        }
+        assertThrows(EquipmentMasterException.class,
+                () -> SetStatusCommand.parse("setstatus 1 s/loaned"));
     }
 
     @Test
     public void parseByIndex_missingStatus_throwsException() {
-        try {
-            SetStatusCommand.parse("setstatus 1 q/5");
-            fail("Expected EquipmentMasterException");
-        } catch (EquipmentMasterException e) {
-            // expected - format invalid
-        }
+        assertThrows(EquipmentMasterException.class,
+                () -> SetStatusCommand.parse("setstatus 1 q/5"));
     }
 
     @Test
     public void parseByIndex_missingIndex_throwsException() {
-        try {
-            SetStatusCommand.parse("setstatus q/5 s/loaned");
-            fail("Expected EquipmentMasterException");
-        } catch (EquipmentMasterException e) {
-            assertEquals("Please enter a valid whole number for index", e.getMessage());
-        }
+        EquipmentMasterException exception = assertThrows(EquipmentMasterException.class,
+                () -> SetStatusCommand.parse("setstatus q/5 s/loaned"));
+        assertEquals("Please enter a valid whole number for index", exception.getMessage());
     }
 
     @Test
-    public void executeByName_loanWithZeroQuantity_noChange() {
-        ModuleList moduleList = new ModuleList();
-        equipments.addEquipment(new Equipment("Camera", 5, 5, 0));
+    public void executeByName_loanWithZeroQuantity_noChange() throws EquipmentMasterException {
+        addEquipment("Camera", 5, 5, 0);
+
         SetStatusCommand command = new SetStatusCommand("Camera", 0, "loaned");
+        command.execute(createContext());
 
-        try {
-            AcademicSemester currentSystemSemester = new AcademicSemester("AY2024/25 Sem1");
-            Context context = new Context(equipments, moduleList, ui, storage, currentSystemSemester);
-            command.execute(context);
-
-            Equipment eq = equipments.getEquipment(0);
-            assertEquals(5, eq.getAvailable());
-            assertEquals(0, eq.getLoaned());
-        } catch (EquipmentMasterException e) {
-            fail("Test setup failed unexpectedly: " + e.getMessage());
-        }
+        Equipment eq = equipments.getEquipment(0);
+        assertEquals(5, eq.getAvailable());
+        assertEquals(0, eq.getLoaned());
     }
 
     @Test
     public void executeByName_loanExactAvailable_works() throws EquipmentMasterException {
-        ModuleList moduleList = new ModuleList();
-        equipments.addEquipment(new Equipment("Projector", 3, 3, 0));
-        SetStatusCommand command = new SetStatusCommand("Projector", 3, "loaned");
+        addEquipment("Projector", 3, 3, 0);
 
-        AcademicSemester currentSystemSemester = new AcademicSemester("AY2024/25 Sem1");
-        Context context = new Context(equipments, moduleList, ui, storage, currentSystemSemester);
-        command.execute(context);
+        SetStatusCommand command = new SetStatusCommand("Projector", 3, "loaned");
+        command.execute(createContext());
 
         Equipment eq = equipments.getEquipment(0);
         assertEquals(0, eq.getAvailable());
@@ -508,13 +363,10 @@ public class SetStatusCommandTest {
 
     @Test
     public void executeByName_returnExactLoaned_works() throws EquipmentMasterException {
-        ModuleList moduleList = new ModuleList();
-        equipments.addEquipment(new Equipment("Headphones", 10, 5, 5));
-        SetStatusCommand command = new SetStatusCommand("Headphones", 5, "available");
+        addEquipment("Headphones", 10, 5, 5);
 
-        AcademicSemester currentSystemSemester = new AcademicSemester("AY2024/25 Sem1");
-        Context context = new Context(equipments, moduleList, ui, storage, currentSystemSemester);
-        command.execute(context);
+        SetStatusCommand command = new SetStatusCommand("Headphones", 5, "available");
+        command.execute(createContext());
 
         Equipment eq = equipments.getEquipment(0);
         assertEquals(10, eq.getAvailable());
@@ -523,13 +375,10 @@ public class SetStatusCommandTest {
 
     @Test
     public void executeByName_caseInsensitiveNameMatch_works() throws EquipmentMasterException {
-        ModuleList moduleList = new ModuleList();
-        equipments.addEquipment(new Equipment("RaspberryPi", 25, 25, 0));
-        SetStatusCommand command = new SetStatusCommand("raspberrypi", 5, "loaned"); // Lowercase
+        addEquipment("RaspberryPi", 25, 25, 0);
 
-        AcademicSemester currentSystemSemester = new AcademicSemester("AY2024/25 Sem1");
-        Context context = new Context(equipments, moduleList, ui, storage, currentSystemSemester);
-        command.execute(context);
+        SetStatusCommand command = new SetStatusCommand("raspberrypi", 5, "loaned");
+        command.execute(createContext());
 
         Equipment eq = equipments.getEquipment(0);
         assertEquals(20, eq.getAvailable());
@@ -538,15 +387,12 @@ public class SetStatusCommandTest {
 
     @Test
     public void executeByIndex_loanMultipleTimes_accumulates() throws EquipmentMasterException {
-        ModuleList moduleList = new ModuleList();
-        equipments.addEquipment(new Equipment("SolderingIron", 50, 50, 0));
+        addEquipment("SolderingIron", 50, 50, 0);
 
         SetStatusCommand command1 = new SetStatusCommand(1, 10, "loaned");
         SetStatusCommand command2 = new SetStatusCommand(1, 5, "loaned");
 
-        AcademicSemester currentSystemSemester = new AcademicSemester("AY2024/25 Sem1");
-        Context context = new Context(equipments, moduleList, ui, storage, currentSystemSemester);
-
+        Context context = createContext();
         command1.execute(context);
         command2.execute(context);
 
@@ -557,13 +403,10 @@ public class SetStatusCommandTest {
 
     @Test
     public void executeByIndex_returnPartialLoaned_works() throws EquipmentMasterException {
-        ModuleList moduleList = new ModuleList();
-        equipments.addEquipment(new Equipment("LogicAnalyzer", 20, 10, 10));
-        SetStatusCommand command = new SetStatusCommand(1, 4, "available");
+        addEquipment("LogicAnalyzer", 20, 10, 10);
 
-        AcademicSemester currentSystemSemester = new AcademicSemester("AY2024/25 Sem1");
-        Context context = new Context(equipments, moduleList, ui, storage, currentSystemSemester);
-        command.execute(context);
+        SetStatusCommand command = new SetStatusCommand(1, 4, "available");
+        command.execute(createContext());
 
         Equipment eq = equipments.getEquipment(0);
         assertEquals(14, eq.getAvailable());
@@ -572,45 +415,33 @@ public class SetStatusCommandTest {
 
     @Test
     public void parseByName_withSpecialCharactersInName_throwsException() {
-        try {
-            SetStatusCommand.parse("setstatus n/Test|Name q/5 s/loaned");
-            fail("Expected EquipmentMasterException");
-        } catch (EquipmentMasterException e) {
-            assertEquals(MESSAGE_NAME_CONTAINS_RESERVED_CHARS, e.getMessage());
-        }
+        EquipmentMasterException exception = assertThrows(EquipmentMasterException.class,
+                () -> SetStatusCommand.parse("setstatus n/Test|Name q/5 s/loaned"));
+        assertEquals(MESSAGE_NAME_CONTAINS_RESERVED_CHARS, exception.getMessage());
     }
 
     @Test
     public void parse_emptyCommand_throwsException() {
-        try {
-            SetStatusCommand.parse("");
-            fail("Expected EquipmentMasterException");
-        } catch (EquipmentMasterException e) {
-            assertEquals("Empty command.", e.getMessage());
-        }
+        EquipmentMasterException exception = assertThrows(EquipmentMasterException.class,
+                () -> SetStatusCommand.parse(""));
+        assertEquals("Empty command.", exception.getMessage());
     }
 
     @Test
     public void parse_whitespaceOnly_throwsException() {
-        try {
-            SetStatusCommand.parse("   ");
-            fail("Expected EquipmentMasterException");
-        } catch (EquipmentMasterException e) {
-            assertEquals("Empty command.", e.getMessage());
-        }
+        EquipmentMasterException exception = assertThrows(EquipmentMasterException.class,
+                () -> SetStatusCommand.parse("   "));
+        assertEquals("Empty command.", exception.getMessage());
     }
 
     @Test
     public void executeByName_loanThenReturn_restoresOriginal() throws EquipmentMasterException {
-        ModuleList moduleList = new ModuleList();
-        equipments.addEquipment(new Equipment("TestGear", 100, 100, 0));
+        addEquipment("TestGear", 100, 100, 0);
 
         SetStatusCommand loanCmd = new SetStatusCommand("TestGear", 30, "loaned");
         SetStatusCommand returnCmd = new SetStatusCommand("TestGear", 30, "available");
 
-        AcademicSemester currentSystemSemester = new AcademicSemester("AY2024/25 Sem1");
-        Context context = new Context(equipments, moduleList, ui, storage, currentSystemSemester);
-
+        Context context = createContext();
         loanCmd.execute(context);
         returnCmd.execute(context);
 
@@ -620,26 +451,14 @@ public class SetStatusCommandTest {
     }
 
     @Test
-    public void executeByName_indexAndNameBothNull_showsErrorMessage() {
-        ModuleList moduleList = new ModuleList();
-    }
+    public void executeByName_loanWithAvailableZero_showsNoChange() throws EquipmentMasterException {
+        addEquipment("EmptyStock", 10, 0, 10);
 
-    @Test
-    public void executeByName_loanWithAvailableZero_showsErrorMessage() {
-        ModuleList moduleList = new ModuleList();
-        equipments.addEquipment(new Equipment("EmptyStock", 10, 0, 10));
         SetStatusCommand command = new SetStatusCommand("EmptyStock", 1, "loaned");
+        command.execute(createContext());
 
-        try {
-            AcademicSemester currentSystemSemester = new AcademicSemester("AY2024/25 Sem1");
-            Context context = new Context(equipments, moduleList, ui, storage, currentSystemSemester);
-            command.execute(context);
-
-            Equipment eq = equipments.getEquipment(0);
-            assertEquals(0, eq.getAvailable());
-            assertEquals(10, eq.getLoaned());
-        } catch (EquipmentMasterException e) {
-            fail("Test setup failed: " + e.getMessage());
-        }
+        Equipment eq = equipments.getEquipment(0);
+        assertEquals(0, eq.getAvailable());
+        assertEquals(10, eq.getLoaned());
     }
 }

@@ -230,7 +230,7 @@ public class AddCommand extends Command {
      * @param context The application context containing the equipment list, UI, and storage.
      */
     @Override
-    public void execute(Context context) {
+    public void execute(Context context) throws EquipmentMasterException {
         EquipmentList equipments = context.getEquipments();
         Ui ui = context.getUi();
         Storage storage = context.getStorage();

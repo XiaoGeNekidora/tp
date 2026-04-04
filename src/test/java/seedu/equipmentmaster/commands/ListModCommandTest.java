@@ -9,8 +9,8 @@ import seedu.equipmentmaster.module.Module;
 import seedu.equipmentmaster.modulelist.ModuleList;
 import seedu.equipmentmaster.ui.Ui;
 
-public class ListModCommandTest {
 
+public class ListModCommandTest {
     private ModuleList moduleList;
     private Ui ui;
 

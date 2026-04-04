@@ -120,7 +120,7 @@ public class AcademicSemesterTest {
         AcademicSemester olderSem = new AcademicSemester("AY2024/25 Sem1");
 
         // Since the source code uses the 'assert' keyword, it throws an AssertionError
-        assertThrows(AssertionError.class, () -> {
+        assertThrows(EquipmentMasterException.class, () -> {
             newerSem.calculateAgeInYears(olderSem);
         });
     }

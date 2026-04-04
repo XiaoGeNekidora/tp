@@ -170,7 +170,7 @@ public class SetBufferCommand extends Command {
      * @param context The application context containing the equipment list, UI, and current system semester.
      */
     @Override
-    public void execute(Context context) {
+    public void execute(Context context) throws EquipmentMasterException {
         EquipmentList equipments = context.getEquipments();
         Ui ui = context.getUi();
         Storage storage = context.getStorage();

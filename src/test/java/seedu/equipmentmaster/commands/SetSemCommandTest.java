@@ -136,27 +136,15 @@ public class SetSemCommandTest {
     }
 
     @Test
-    public void execute_nullOrEmptyRawSem_showsErrorMessage() {
-        // Triggers the safety check at lines 67-70 by manually creating the command
-        Ui ui = new Ui();
-        Context context = new Context(equipments, moduleList, ui, storage, null);
-
-        // Case 1: Null
-        SetSemCommand nullCmd = new SetSemCommand(null);
-        nullCmd.execute(context);
-
-        // Case 2: Empty
-        SetSemCommand emptyCmd = new SetSemCommand("");
-        emptyCmd.execute(context);
-    }
-
-    @Test
-    public void execute_invalidSemesterFormat_showsErrorMessage() {
+    public void execute_invalidSemesterFormat_showsErrorMessage() throws EquipmentMasterException {
         // Passes parse check but fails AcademicSemester validation (line 75)
         SetSemCommand command = new SetSemCommand("NotASemesterFormat");
         Context context = new Context(equipments, moduleList, new Ui(), storage, null);
 
-        command.execute(context);
+        EquipmentMasterException thrown = assertThrows(EquipmentMasterException.class, () -> {
+            command.execute(context);
+        });
+        assertTrue(thrown.getMessage().contains("Invalid format"));
     }
 
     @Test
@@ -211,12 +199,16 @@ public class SetSemCommandTest {
 
     @Test
     public void execute_nullRawSem_triggersDefensiveCheck() {
-        // Manually creating a command with null to trigger the safety check at line 67
-        SetSemCommand command = new SetSemCommand(null);
-        Context context = new Context(equipments, moduleList, new Ui(), storage, null);
+        assertThrows(AssertionError.class, () -> {
+            new SetSemCommand(null);
+        });
+    }
 
-        command.execute(context);
-        // This hits the branch: if (rawSem == null ...)
+    @Test
+    public void execute_nullOrEmptyRawSem_showsErrorMessage() {
+        assertThrows(AssertionError.class, () -> {
+            new SetSemCommand("   ");
+        });
     }
 
     @Test

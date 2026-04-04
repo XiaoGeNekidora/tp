@@ -137,15 +137,10 @@ public class FindCommandTest {
     }
 
     @Test
-    public void getMatchingEquipments_nullKeyword_returnsAll() {
-        // Checks that a null keyword (safety check) returns the full list
-        EquipmentList equipments = new EquipmentList();
-        equipments.addEquipment(new Equipment("Item A", 10));
-
-        FindCommand command = new FindCommand(null);
-        ArrayList<Equipment> matches = command.getMatchingEquipments(equipments);
-
-        assertEquals(1, matches.size());
+    public void getMatchingEquipments_nullKeyword_throwsAssertionError() {
+        assertThrows(AssertionError.class, () -> {
+            new FindCommand(null);
+        });
     }
 
     @Test

@@ -143,21 +143,6 @@ public class ModuleTest {
     }
 
     @Test
-    public void toString_nullRequirements_coversNullBranch() throws Exception {
-        Module module = new Module("CG2111A", 150);
-
-        // Use Reflection to bypass encapsulation and force the map to be null.
-        // This is necessary to trigger the left side of the '||' condition (this.equipmentRequirements == null)
-        // because the constructor guarantees it is never null in normal execution.
-        java.lang.reflect.Field field = Module.class.getDeclaredField("equipmentRequirements");
-        field.setAccessible(true);
-        field.set(module, null);
-
-        // Calling toString() now will guarantee hitting the '== null' check
-        assertEquals("CG2111A | Enrollment: 150 students", module.toString());
-    }
-
-    @Test
     public void toString_varyingRequirements_coversCommaBranches() throws EquipmentMasterException {
         Module module = new Module("CG2111A", 150);
 

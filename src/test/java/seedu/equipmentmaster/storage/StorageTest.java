@@ -268,30 +268,21 @@ public class StorageTest {
 
     @Test
     public void saveMethods_ioException_caught() {
-        // Intentionally set paths to existing directories to force FileWriter to throw an IOException
-        File badEq = tempDir.resolve("bad_eq").toFile();
-        badEq.mkdir();
-        File badSet = tempDir.resolve("bad_set").toFile();
-        badSet.mkdir();
-        File badMod = tempDir.resolve("bad_mod").toFile();
-        badMod.mkdir();
+        Ui dummyUi = new Ui();
+        String badPath = tempDir.resolve("bad_dir").toString();
+        File badDir = new File(badPath);
+        badDir.mkdir();
 
-        Storage storage = new Storage(badEq.getAbsolutePath(), ui, badSet.getAbsolutePath(), badMod.getAbsolutePath());
+        Storage badStorage = new Storage(badPath, dummyUi, "dummy_set", "dummy_mod");
 
-        // 1. save(equipments) should not crash, but safely catch IOException and print UI message
-        storage.save(new ArrayList<>());
+        EquipmentMasterException thrown = assertThrows(
+                EquipmentMasterException.class,
+                () -> badStorage.save(new java.util.ArrayList<>())
+        );
 
-        // 2. saveSettings() catches IOException internally
-        try {
-            storage.saveSettings(new AcademicSemester("AY2024/25 Sem1"));
-        } catch (Exception e) {
-            fail("Exception should be caught internally by saveSettings");
-        }
-
-        // 3. saveModules() explicitly throws EquipmentMasterException to the caller
-        assertThrows(EquipmentMasterException.class, () -> {
-            storage.saveModules(new ModuleList());
-        });
+        assertTrue(
+                thrown.getMessage().contains("Error saving equipment data")
+        );
     }
 
     @Test

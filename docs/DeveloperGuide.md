@@ -48,7 +48,7 @@ static {
 ```
 
 #### 3. UML Class Diagram
-**Class Diagram: System Architecture**
+**Class Diagram: Parser Component**
 ![Parser Class Diagram](images/parser.png)
 
 #### 4. Design Considerations
@@ -76,7 +76,7 @@ The `AddCommand` is instantiated via its static `parse` method. The execution fl
 4.  **Execution & Save:** Once validated, the `AddCommand` is returned. When executed, it instantiates the `Equipment`, adds it to the `EquipmentList`, and triggers `Storage#save()` to persist the new inventory state.
 
 #### 3. UML Diagrams
-**Class Diagram: System Architecture**
+**Class Diagram: AddCommand**
 (Note: This diagram focuses strictly on the internal structure of `AddCommand` and its inheritance from `Command`. Associated domain classes like `Context`, `Equipment`, and `AcademicSemester` are shown as data types, but their full class definitions are omitted here for clarity.)
 ![AddCommand Class Diagram](images/AddCommandClass.png)
 
@@ -451,7 +451,7 @@ The calculation follows this strict algorithm for each equipment item:
   *   Note: It uses *Total Quantity* rather than *Available Quantity* because procurement decisions are based on total asset ownership, regardless of whether items are currently loaned out.
 5.  **Output**: If `To Buy > 0`, the item is flagged in the report.
 
-### 3. Sequence Diagram: Procurement Report Execution
+#### 3. Sequence Diagram: Procurement Report Execution
 _(Note: The `getModuleByName` logic is represented as a self-invocation within the `ReportCommand`, and standard math calculations for demand are abstracted to focus on object interactions.)_
 ![Procurement Report Diagram](images/ProcurementReport.png)
 

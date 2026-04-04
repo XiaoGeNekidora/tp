@@ -177,7 +177,9 @@ public class ReportCommand extends Command {
             try {
                 age = purchaseSem.calculateAgeInYears(targetSem);
             } catch (EquipmentMasterException e) {
-                throw new RuntimeException(e);
+                ui.showMessage(String.format("Warning: Skipping equipment '%s' due to invalid purchase semester data.",
+                        eq.getName()));
+                continue;
             }
             if (age >= lifespan) {
                 agingCount++;

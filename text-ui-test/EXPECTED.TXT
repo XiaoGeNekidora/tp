@@ -169,7 +169,7 @@ Invalid index. Please check the list again.
 Equipment 'Aliens' not found.
 ===================================================
 ===================================================
-Only 0 available unit(s) available. Cannot delete 5000.
+Only 0 unit(s) are available. Cannot delete 5000.
 ===================================================
 ===================================================
 Quantity must be > 0.
@@ -181,10 +181,10 @@ Quantity must be > 0.
 Quantity must be a valid whole number.
 ===================================================
 ===================================================
-Only 0 available unit(s) available. Cannot delete 1.
+Only 0 unit(s) are available. Cannot delete 1.
 ===================================================
 ===================================================
-Only 0 available unit(s) available. Cannot delete 10.
+Only 0 unit(s) are available. Cannot delete 10.
 ===================================================
 ===================================================
 Deleted 5 available unit(s) of STM32.
@@ -258,7 +258,7 @@ Successfully deleted module: CS2113
 Module not found: GhostModule
 ===================================================
 ===================================================
-Invalid command format. 
+Invalid command format.
 Expected: delmod n/NAME
 ===================================================
 ===================================================

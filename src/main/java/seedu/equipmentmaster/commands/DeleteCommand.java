@@ -132,8 +132,9 @@ public class DeleteCommand extends Command {
         int currentAmount = status.equals(STATUS_AVAILABLE) ? target.getAvailable() : target.getLoaned();
 
         if (quantity > currentAmount) {
-            throw new EquipmentMasterException("Only " + currentAmount + " " + status +
-                    " unit(s) available. Cannot delete " + quantity + ".");
+            String statusDescription = status.equals(STATUS_AVAILABLE) ? "available" : "currently loaned out";
+            throw new EquipmentMasterException("Only " + currentAmount + " unit(s) are " + statusDescription
+                    + ". Cannot delete " + quantity + ".");
         }
 
         if (status.equals(STATUS_AVAILABLE)) {
@@ -177,7 +178,7 @@ public class DeleteCommand extends Command {
 
             return q;
         } catch (NumberFormatException e) {
-            logger.log(Level.WARNING, "User provided invalid quantity string: " + qStr); // 新增日志
+            logger.log(Level.WARNING, "User provided invalid quantity string: " + qStr);
             throw new EquipmentMasterException("Quantity must be a valid whole number.");
         }
     }

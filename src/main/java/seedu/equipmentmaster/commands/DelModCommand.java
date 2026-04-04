@@ -84,7 +84,7 @@ public class DelModCommand extends Command {
 
         if (!matcher.matches()) {
             logger.log(Level.WARNING, "Parse failed: invalid format for delmod.");
-            throw new EquipmentMasterException("Invalid command format. \nExpected: delmod n/NAME");
+            throw new EquipmentMasterException("Invalid command format.\nExpected: delmod n/NAME");
         }
 
         String moduleName = matcher.group(1).trim();

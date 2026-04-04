@@ -95,7 +95,7 @@ public class UpdateModCommand extends Command {
 
         if (!matcher.matches()) {
             logger.log(Level.WARNING, "Parse failed: Invalid command format.");
-            throw new EquipmentMasterException("Invalid command format. \nExpected: updatemod n/NAME pax/QTY");
+            throw new EquipmentMasterException("Invalid command format.\nExpected: updatemod n/NAME pax/QTY");
         }
 
         String moduleName = matcher.group(1).trim();

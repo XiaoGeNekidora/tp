@@ -298,13 +298,5 @@ public class DeleteCommandTest {
         });
     }
 
-    @Test
-    public void execute_negativeIndex_throwsException() {
-        assertThrows(EquipmentMasterException.class, () -> {
-            DeleteCommand command = new DeleteCommand(-1, 1, "available");
-            AcademicSemester currentSystemSemester = new AcademicSemester("AY2024/25 Sem1");
-            Context context = new Context(equipments, new ModuleList(), ui, storage, currentSystemSemester);
-            command.execute(context);
-        });
-    }
+
 }

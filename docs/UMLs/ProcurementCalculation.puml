@@ -14,6 +14,7 @@ repeat while (more modules?) is (yes)
 :Apply Safety Buffer (Total_Required * (1 + Buffer));
 :Round Up using Math.ceil();
 :Subtract Total_Owned (Available + Loaned);
+:Compute To_Buy = Required - Total_Owned;
 
 if (To_Buy > 0) then (yes)
   :Add Item to Procurement Report;

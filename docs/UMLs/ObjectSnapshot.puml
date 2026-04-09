@@ -16,6 +16,6 @@ Context *-- ModList
 EqList o-- E1
 ModList o-- M1
 
-E1 ..> M1 : "tagged with >"
+E1 ..> M1 : "tagged with"
 note right of E1 : Equipment points to \nModule Code as a String
 @enduml

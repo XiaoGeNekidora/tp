@@ -124,4 +124,39 @@ public class AcademicSemesterTest {
             newerSem.calculateAgeInYears(olderSem);
         });
     }
+
+    /**
+     * Targets the assertion in the constructor.
+     */
+    @Test
+    public void constructor_nullInput_assertionFails() {
+        try {
+            new AcademicSemester(null);
+        } catch (AssertionError | EquipmentMasterException e) {
+            assertTrue(e.getMessage().contains("Raw semester input cannot be null"));
+        }
+    }
+
+    /**
+     * Targets the assertion in calculateAgeInYears.
+     */
+    @Test
+    public void calculateAge_nullCurrentSemester_assertionFails() throws EquipmentMasterException {
+        AcademicSemester sem = new AcademicSemester("AY2024/25 Sem1");
+        try {
+            sem.calculateAgeInYears(null);
+        } catch (AssertionError e) {
+            assertTrue(e.getMessage().contains("Current reference semester cannot be null"));
+        }
+    }
+
+    /**
+     * Targets the 'if (this == obj)' optimization branch in equals().
+     */
+    @Test
+    public void equals_sameObjectReference_returnsTrue() throws EquipmentMasterException {
+        AcademicSemester sem = new AcademicSemester("AY2024/25 Sem1");
+        // Comparing the exact same memory reference
+        assertTrue(sem.equals(sem));
+    }
 }

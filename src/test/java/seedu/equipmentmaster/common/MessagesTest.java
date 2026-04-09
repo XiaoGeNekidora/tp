@@ -40,6 +40,9 @@ public class MessagesTest {
 
         assertEquals("Invalid setbuffer format. Usage: setbuffer n/NAME b/PERCENTAGE or setbuffer i/INDEX b/PERCENTAGE",
                 Messages.MESSAGE_INVALID_SETBUFFER_FORMAT);
+
+        assertEquals("Invalid name! Names cannot contain reserved storage characters: '|', ',', or '='",
+                Messages.MESSAGE_NAME_CONTAINS_RESERVED_CHARS);
     }
 
     @Test
@@ -49,4 +52,6 @@ public class MessagesTest {
         Messages messages = new Messages();
         assertNotNull(messages);
     }
+
+
 }

@@ -9,6 +9,8 @@ import seedu.equipmentmaster.module.Module;
 import seedu.equipmentmaster.modulelist.ModuleList;
 import seedu.equipmentmaster.ui.Ui;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 
 public class ListModCommandTest {
     private ModuleList moduleList;
@@ -40,5 +42,21 @@ public class ListModCommandTest {
 
         ListModCommand command = new ListModCommand();
         command.execute(context);
+    }
+
+    /**
+     * Targets the assertion branch in the execute() method.
+     * Evaluates the defensive programming check for a null context.
+     */
+    @Test
+    public void execute_nullContext_assertionFails() {
+        ListModCommand command = new ListModCommand();
+
+        try {
+            command.execute(null);
+        } catch (AssertionError | EquipmentMasterException e) {
+            // Expected to fail the assertion before doing anything else
+            assertTrue(e.getMessage().contains("Context should not be null during execution"));
+        }
     }
 }

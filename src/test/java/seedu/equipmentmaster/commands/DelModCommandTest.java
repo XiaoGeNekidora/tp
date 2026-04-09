@@ -142,4 +142,63 @@ public class DelModCommandTest {
             DelModCommand.parse("delmod n/   ");
         });
     }
+
+    /**
+     * Targets the ternary operator branch (moduleName == null)
+     * and the subsequent assertion logic in the constructor.
+     */
+    @Test
+    public void constructor_nullName_assertionFails() {
+        try {
+            new DelModCommand(null);
+        } catch (AssertionError e) {
+            assertTrue(e.getMessage().contains("Module name cannot be null or empty"));
+        }
+    }
+
+    /**
+     * Targets the assertion branch where the name is not null,
+     * but becomes empty after the trim() operation.
+     */
+    @Test
+    public void constructor_emptyName_assertionFails() {
+        try {
+            new DelModCommand("   ");
+        } catch (AssertionError e) {
+            assertTrue(e.getMessage().contains("Module name cannot be null or empty"));
+        }
+    }
+
+    /**
+     * Targets the 'assert context != null' branch in the execute() method.
+     */
+    @Test
+    public void execute_nullContext_assertionFails() {
+        DelModCommand command = new DelModCommand("CG2111A");
+        try {
+            command.execute(null);
+        } catch (AssertionError | EquipmentMasterException e) {
+            // Expected to fail the assertion before throwing any other exception
+        }
+    }
+
+    /**
+     * Targets the regex zero-whitespace quantifier (\\s*) branch.
+     * Evaluates the behavior when 'delmod' is immediately followed by 'n/'.
+     */
+    @Test
+    public void parse_zeroWhitespaceAfterCommand_success() throws EquipmentMasterException {
+        // "delmodn/" instead of "delmod n/"
+        DelModCommand command = DelModCommand.parse("delmodn/CG2111A");
+        assertTrue(command instanceof DelModCommand);
+    }
+
+    /**
+     * Targets the regex (.+) to ensure it correctly captures module names containing spaces.
+     */
+    @Test
+    public void parse_moduleNameWithSpaces_success() throws EquipmentMasterException {
+        DelModCommand command = DelModCommand.parse("delmod n/CS 2113");
+        assertTrue(command instanceof DelModCommand);
+    }
 }

@@ -327,9 +327,9 @@ When `updatemod n/CG2111A pax/180` is executed:
 3. Internally, the target `Module`'s enrollment size is updated via `Module#setPax(newPax)`.
 4. `Storage#saveModules()` is invoked to persist the updated state. 
 
-* **Defensive Deletion:** The DelModCommand verifies module existence via ModuleList#hasModule() before removal. If a user attempts to delete a non-existent module, the system catches the reference error and aborts the operation gracefully to prevent state corruption.
+* **Defensive Deletion:** The `DelModCommand#execute` directly invokes `moduleList.deleteModule(moduleName)`. If the module is missing, the underlying model throws an exception which is caught by the execution loop. This avoids redundant pre-checks and ensures a streamlined control flow.
 
-* **Storage Resilience:** To ensure data integrity, the command wraps Storage#saveModules() in a try-catch block. This prevents the application from crashing during hardware or file system failures, notifying the user via the Ui instead.
+* **Storage Resilience:** To ensure data integrity, the command wraps `Storage#saveModules()` in a try-catch block. This prevents the application from crashing during hardware or file system failures, notifying the user via the Ui instead.
 
 **Code Snippet: Defensive Programming and Validation**
 To demonstrate our adherence to defensive programming, the parsing and validation logic for `UpdateModCommand` ensures that critical metadata like `pax` cannot be set to invalid states (e.g., negative numbers) before the command is even instantiated:
@@ -400,8 +400,8 @@ Execution flow of `TagCommand#execute(Context)`:
 
 1.  **State Extraction:** The command retrieves both the `ModuleList` and `EquipmentList` from the `Context`.
 
-2.  **Double Ghost Reference Check:** The system queries both lists to verify existence: `modules.hasModule(moduleName)` and `equipments.hasEquipment(equipmentName)`.
--   **Edge Case Handling: If either entity is missing, the command "fails fast" by throwing an EquipmentMasterException. This prevents "orphaned tags" where equipment is mapped to a non-existent course, ensuring the Procurement Report never encounters a NullPointerException.**
+   2.  **Double Ghost Reference Check:** The system queries both lists to verify existence: `modules.hasModule(moduleName)` and `equipments.hasEquipment(equipmentName)`.
+       * **Edge Case Handling: If either entity is missing, the command "fails fast" by throwing an EquipmentMasterException. This prevents "orphaned tags" where equipment is mapped to a non-existent course, ensuring the Procurement Report never encounters a NullPointerException.**
 
 3.  **Target Resolution:** If either entity is missing, the operation is immediately aborted, throwing a detailed exception explaining exactly which entity (or both) is missing.
 
@@ -439,7 +439,7 @@ The following sequence diagrams illustrate the execution flow for the `TagComman
 #### 1. Overview
 A comprehensive JUnit 5 test suite was developed to ensure the reliability of core commands, specifically targeting 100% Branch Coverage for the Tag and DelMod logic paths.
 
-#### 2. Implementation Details : Failure Simulation
+#### 2. Implementation Details: Failure Simulation
 To test the system’s robustness against disk errors, we utilized Anonymous Class Mocking. By overriding Storage#saveModules() to throw a simulated EquipmentMasterException, we verified that the commands handle exceptions gracefully without crashing the application.
 
 #### 3. UML Sequence Diagram: Testing Storage Failure
@@ -698,11 +698,11 @@ To test the system with pre-populated data without typing everything manually:
 3. **Setting Buffer Percentage:**
   * **Test Case:** Type `setbuffer n/Oscilloscope b/15`.
   * **Expected:** The safety buffer for Oscilloscope is updated to 15%.
-4**Setting Minimum Threshold by Index:**
-* **Test Case:** Type `setmin 1 min/5`.
-* **Expected:** The minimum threshold for the first item in the list is updated to 5, identical to using the name-based format.
-* **Test Case:** Type `setmin 99 min/5`.
-* **Expected:** System displays an error message indicating the index is invalid.
+4. **Setting Minimum Threshold by Index:**
+  * **Test Case:** Type `setmin 1 min/5`.
+  * **Expected:** The minimum threshold for the first item in the list is updated to 5, identical to using the name-based format.
+  * **Test Case:** Type `setmin 99 min/5`.
+  * **Expected:** System displays an error message indicating the index is invalid.
 
 ### 8. Testing Additional Reports
 1. **Low Stock Report:**

@@ -158,6 +158,7 @@ Invalid index. Please provide an index between 1 and 5.
 ===================================================
 ===================================================
 10 units of Ghost are now LOANED.
+Warning: Ghost is now below minimum threshold of 10. Consider restocking.
 ===================================================
 ===================================================
 Invalid format. Use: delete [INDEX|n/NAME] q/QUANTITY s/STATUS

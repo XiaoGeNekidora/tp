@@ -225,7 +225,7 @@ public class ReportCommand extends Command {
                                 "' but not found in its equipment requirements. " +
                                 "Skipping this module for demand calculation.");
                     } else {
-                        double ratio = module.getEquipmentRequirements().get(eq.getName());
+                        double ratio = requirements.get(eq.getName());
                         baseDemand += (int) Math.ceil(module.getPax() * ratio);
                     }
                 } else {

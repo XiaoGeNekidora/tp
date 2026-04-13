@@ -141,9 +141,9 @@ public class ReportCommandTest {
     // @@author
 
     @Test
-    public void execute_lowStockReport_sufficientTotalNoWarning() throws EquipmentMasterException {
+    public void execute_lowStockReport_sufficientAvailableNoWarning() throws EquipmentMasterException {
         // Arrange: Set up an equipment item where Total = 21, Min Threshold = 10.
-        // Simulate all 21 items being loaned out (Available = 11, Loaned = 10).
+        // Simulate 21 items being loaned out (Available = 11, Loaned = 10).
         Equipment ghost = new Equipment("Ghost", 21, 11, 10, null, 0.0, 10);
         equipments.addEquipment(ghost);
         ModuleList moduleList = new ModuleList();

@@ -48,7 +48,7 @@ public class SetMinCommand extends Command {
         target.setMinQuantity(minQty);
         ui.showMessage("Success: Minimum threshold for " + target.getName() + " set to " + minQty);
 
-        if (target.getQuantity() < target.getMinQuantity()) {
+        if (target.getAvailable() <= target.getMinQuantity()) {
             ui.showMessage("Warning: Item is currently below this new threshold!");
         }
         storage.save(equipments.getAllEquipments());
